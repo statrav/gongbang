@@ -50,7 +50,10 @@
 }
 .prose pre code { background: none; padding: 0; }
 /* 휴대폰 캡처처럼 세로로 긴 그림은 높이로 줄이고, 가로로 넓은 그림은 폭에 맞춘다 */
-.prose img { display: block; width: auto; height: auto; max-width: 100%; max-height: 36rem; border: 1px solid var(--color-grid); }
+.prose img { display: block; width: auto; height: auto; max-width: 100%; max-height: 30rem; border: 1px solid var(--color-grid); }
+/* 한 줄에 그림 두 개(![a](x) ![b](y))를 쓰면 나란히 놓는다 */
+.prose p:has(> img + img) { display: flex; align-items: flex-start; gap: var(--space-sm); }
+.prose p:has(> img + img) img { min-width: 0; max-width: calc(50% - var(--space-sm) / 2); }
 .prose figure { margin-inline: 0; }
 .prose figcaption { font-size: var(--text-sm); color: var(--color-graphite); margin-top: var(--space-xs); }
 .prose hr { border: 0; border-top: 1px dashed var(--color-graphite); margin-block: var(--space-xl); }
