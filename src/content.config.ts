@@ -7,7 +7,7 @@ const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
   schema: z.object({
     title: z.string(),
-    // 서비스 이름이 아직 없으면 "이름 미정"처럼 제목 옆에 작게 붙는다
+    // 서비스 이름이 아직 없으면 "가제"처럼 제목 옆에 작게 붙는다
     note: z.string().optional(),
     summary: z.string(),
     status: z.enum(['active', 'paused', 'done']),
