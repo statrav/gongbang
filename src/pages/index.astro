@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import LogList from '../components/LogList.astro';
+import { getProjects, getLogs } from '../lib/content';
+import { SITE } from '../lib/site';
+import { url } from '../lib/url';
+
+const projects = await getProjects();
+const onBench = projects.filter((p) => p.data.status === 'active');
+const logs = (await getLogs()).slice(0, 8);
+const projectTitles = Object.fromEntries(projects.map((p) => [p.id, p.data.title]));
+---
+
+<Base>
+  <div class="container home">
+    <section class="hero">
+      <h1>퇴근 후<br />공방</h1>
+      <p>{SITE.description}</p>
+    </section>
+
+    {onBench.length > 0 && (
+      <section class="bench" aria-labelledby="bench-title">
+        <h2 id="bench-title" class="visually-hidden">지금 만드는 것</h2>
+        {onBench.map((p) => <ProjectCard project={p} label="지금 작업대 위" />)}
+      </section>
+    )}
+
+    <section class="logs" aria-labelledby="logs-title">
+      <div class="logs-head">
+        <h2 id="logs-title">제작기</h2>
+        {logs.length > 0 && <a href={url('/logs/')}>전체 보기</a>}
+      </div>
+      <LogList logs={logs} projectTitles={projectTitles} />
+    </section>
+  </div>
+</Base>
+
+<style>
+  .home { display: grid; gap: var(--space-2xl); padding-top: var(--space-xl); }
+  .hero h1 {
+    font-size: var(--text-display);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    overflow-wrap: anywhere;
+  }
+  .hero p { margin: var(--space-md) 0 0; max-width: 30rem; color: var(--color-graphite); font-size: var(--text-lg); line-height: 1.6; }
+  .bench { display: grid; gap: var(--space-md); max-width: 36rem; }
+  .logs { max-width: 42rem; }
+  .logs-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-md); margin-bottom: var(--space-sm); }
+  .logs-head h2 { font-size: var(--text-xl); }
+  .logs-head a { font-size: var(--text-sm); white-space: nowrap; }
+</style>

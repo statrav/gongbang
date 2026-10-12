@@ -1,0 +1,62 @@
+/* Hallmark · macrostructure: Long Document (작업 일지) · tone: 차분한 작업 노트 · anchor hue: 파란 색연필
+ * theme: custom (vibe: "모눈 노트, 연필, 파란 색연필, 형광펜") · display: Hahmlet · body: IBM Plex Sans KR
+ * 시안 A "모눈 작업노트" (https://claude.ai/artifact/2ixe4nUH3qxjK9ztM494f9)
+ * 다른 안으로 바꿀 때는 이 파일만 고친다. 화면 코드는 아래 이름만 쓴다.
+ */
+:root {
+  /* 색 */
+  --color-paper: #f2f4ef;     /* 모눈 바탕 */
+  --color-grid: #dde3da;      /* 모눈선, 구분선 */
+  --color-sheet: #ffffff;     /* 글 종이, 작업대 카드 */
+  --color-ink: #1d2621;       /* 먹색: 본문 */
+  --color-graphite: #56605a;  /* 연필: 보조 글씨 */
+  --color-accent: #2350c8;    /* 파란 색연필: 링크, 강조 하나 */
+  --color-marker: #f3e66a;    /* 형광펜: 본문 ==강조== 와 선택 영역 */
+  --color-focus: #2350c8;
+
+  /* 글꼴 */
+  --font-display: 'Hahmlet Variable', 'Hahmlet', 'Nanum Myeongjo', serif;
+  --font-body: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-mono: ui-monospace, 'D2Coding', 'Consolas', monospace;
+
+  /* 글자 크기 (본문 17px 기준, 1.25배 단계) */
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5625rem;
+  --text-2xl: 1.953rem;
+  --text-display: clamp(2.5rem, 8vw, 4.25rem);
+
+  /* 간격 (4px 단위) */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+
+  --grid-size: 22px;
+  --measure: 38rem;           /* 한글 본문 한 줄 약 36~40자 */
+  --page: 52rem;
+  --rule: 1.5px;
+  --radius: 2px;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --dur-press: 140ms;
+}
+
+/* 어두운 모드: 설계도처럼 짙은 바탕에 옅은 모눈선 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #141a18;
+    --color-grid: #232c28;
+    --color-sheet: #1a211e;
+    --color-ink: #e3e8e3;
+    --color-graphite: #9ba59f;
+    --color-accent: #8fb0ff;
+    --color-marker: #5c5420;
+    --color-focus: #8fb0ff;
+    color-scheme: dark;
+  }
+}

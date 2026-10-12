@@ -1,0 +1,70 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { url, formatDate } from '../lib/url';
+
+interface Props {
+  logs: CollectionEntry<'logs'>[];
+  projectTitles?: Record<string, string>;
+  empty?: string;
+}
+
+const { logs, projectTitles, empty = '아직 올린 제작기가 없어요. 첫 글을 쓰는 중입니다.' } = Astro.props;
+---
+
+{logs.length === 0 ? (
+  <p class="empty">{empty}</p>
+) : (
+  <ol class="log-list">
+    {logs.map((log) => (
+      <li>
+        <time datetime={log.data.date.toISOString().slice(0, 10)}>{formatDate(log.data.date)}</time>
+        <div class="body">
+          <a href={url(`/logs/${log.id}/`)}>{log.data.title}</a>
+          {log.data.draft && <span class="draft">초안</span>}
+          <p>
+            {projectTitles && <span class="project">{projectTitles[log.data.project.id]}</span>}
+            {log.data.summary}
+          </p>
+        </div>
+      </li>
+    ))}
+  </ol>
+)}
+
+<style>
+  .log-list { list-style: none; margin: 0; padding: 0; }
+  li {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    gap: var(--space-md);
+    padding-block: var(--space-md);
+    border-top: 1px solid var(--color-grid);
+  }
+  li:last-child { border-bottom: 1px solid var(--color-grid); }
+  time {
+    color: var(--color-graphite);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.15em;
+    white-space: nowrap;
+  }
+  a {
+    color: var(--color-ink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  a:hover { color: var(--color-accent); text-decoration: underline; }
+  p { margin: var(--space-2xs) 0 0; color: var(--color-graphite); font-size: var(--text-sm); }
+  .project { color: var(--color-accent); margin-right: var(--space-xs); }
+  .draft {
+    margin-left: var(--space-xs);
+    font-size: var(--text-sm);
+    color: var(--color-graphite);
+    border: 1px dashed currentColor;
+    padding: 0 var(--space-xs);
+  }
+  .empty { color: var(--color-graphite); margin: 0; }
+  @media (max-width: 480px) {
+    li { grid-template-columns: minmax(0, 1fr); gap: var(--space-2xs); }
+  }
+</style>

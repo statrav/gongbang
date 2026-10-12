@@ -1,0 +1,71 @@
+---
+import { render, getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getLogs } from '../../lib/content';
+import { url, formatDateLong } from '../../lib/url';
+import '../../styles/prose.css';
+
+export async function getStaticPaths() {
+  const logs = await getLogs();
+  // 날짜 내림차순이라 다음 글(더 최근)은 i-1, 이전 글은 i+1
+  return logs.map((log, i) => ({
+    params: { slug: log.id },
+    props: { log, newer: logs[i - 1], older: logs[i + 1] },
+  }));
+}
+
+const { log, newer, older } = Astro.props;
+const { Content } = await render(log);
+const project = await getEntry(log.data.project);
+const { title, date, summary, draft } = log.data;
+---
+
+<Base title={title} description={summary} type="article">
+  <div class="container page">
+    <nav class="crumbs" aria-label="현재 위치">
+      <a href={url('/logs/')}>제작기</a>
+      {project && <><span aria-hidden="true">/</span> <a href={url(`/projects/${project.id}/`)}>{project.data.title}</a></>}
+    </nav>
+    <article class="sheet">
+      <header>
+        {draft && <p class="draft">초안이라 배포되지 않아요. npm run dev 에서만 보입니다.</p>}
+        <h1>{title}</h1>
+        <p class="meta"><time datetime={date.toISOString().slice(0, 10)}>{formatDateLong(date)}</time></p>
+      </header>
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+    {(newer || older) && (
+      <nav class="pager" aria-label="다른 제작기">
+        {older ? <a href={url(`/logs/${older.id}/`)}><span>이전 글</span>{older.data.title}</a> : <span />}
+        {newer && <a class="newer" href={url(`/logs/${newer.id}/`)}><span>다음 글</span>{newer.data.title}</a>}
+      </nav>
+    )}
+  </div>
+</Base>
+
+<style>
+  .page { padding-top: var(--space-lg); display: grid; gap: var(--space-lg); }
+  .crumbs { font-size: var(--text-sm); color: var(--color-graphite); }
+  header { max-width: var(--measure); margin-bottom: var(--space-xl); }
+  h1 { font-size: var(--text-2xl); }
+  .meta { margin: var(--space-xs) 0 0; color: var(--color-graphite); font-size: var(--text-sm); }
+  .draft {
+    display: inline-block;
+    margin: 0 0 var(--space-sm);
+    padding: var(--space-2xs) var(--space-xs);
+    border: 1px dashed currentColor;
+    font-size: var(--text-sm);
+    color: var(--color-graphite);
+  }
+  .pager { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-md); }
+  .pager a { display: grid; gap: var(--space-2xs); padding-block: var(--space-sm); color: var(--color-ink); text-decoration: none; font-weight: 600; }
+  .pager a:hover { color: var(--color-accent); }
+  .pager span { font-size: var(--text-sm); font-weight: 400; color: var(--color-graphite); }
+  .pager .newer { text-align: right; }
+  @media (max-width: 480px) {
+    .pager { grid-template-columns: minmax(0, 1fr); }
+    .pager .newer { text-align: left; }
+  }
+</style>

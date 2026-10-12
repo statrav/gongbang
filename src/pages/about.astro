@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../lib/site';
+import { url } from '../lib/url';
+import '../styles/prose.css';
+---
+
+<Base title="소개" description={`${SITE.name}이 어떤 곳인지`}>
+  <div class="container page">
+    <h1>소개</h1>
+    <div class="sheet prose">
+      <p>회사 일을 마치고 저녁에 조금씩 만드는 사이드 프로젝트를 모아 두는 곳이에요. 처음엔 우리 집에서 쓰려고 만든 것들이고, 남도 쓸 수 있게 다듬으면서 그 과정을 적어요.</p>
+      <h2>여기에 올리는 것</h2>
+      <ul>
+        <li><a href={url('/projects/')}>프로젝트</a>: 무엇을 하는 도구인지, 어떻게 쓰는지</li>
+        <li><a href={url('/logs/')}>제작기</a>: 만들면서 정한 것, 막힌 것, 알게 된 것</li>
+      </ul>
+      <p>화면 캡처의 금액과 이름은 모두 가상 데이터예요.</p>
+      <h2>연락</h2>
+      <p>코드와 이슈는 <a href={SITE.github}>GitHub</a>에 있어요.</p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .page { padding-top: var(--space-xl); display: grid; gap: var(--space-lg); }
+  h1 { font-size: var(--text-2xl); }
+</style>

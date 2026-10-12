@@ -1,0 +1,56 @@
+---
+import { SITE } from '../lib/site';
+import { url } from '../lib/url';
+
+const links = [
+  { href: '/projects/', label: '프로젝트' },
+  { href: '/logs/', label: '제작기' },
+  { href: '/about/', label: '소개' },
+];
+const here = Astro.url.pathname.replace(/\/$/, '');
+const isCurrent = (href: string) => here.startsWith(url(href).replace(/\/$/, ''));
+---
+
+<header class="site-header container">
+  <a class="wordmark" href={url('/')}>{SITE.name}</a>
+  <nav aria-label="주 메뉴">
+    <ul>
+      {links.map((l) => (
+        <li><a href={url(l.href)} aria-current={isCurrent(l.href) ? 'page' : undefined}>{l.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-lg);
+    padding-block: var(--space-lg);
+  }
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-lg);
+    color: var(--color-ink);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  ul { display: flex; gap: var(--space-lg); list-style: none; margin: 0; padding: 0; }
+  nav a {
+    display: inline-block;
+    padding-block: var(--space-2xs);
+    color: var(--color-graphite);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  nav a:hover { color: var(--color-ink); }
+  nav a[aria-current='page'] {
+    color: var(--color-ink);
+    font-weight: 600;
+    background: linear-gradient(transparent 62%, var(--color-marker) 62%);
+  }
+</style>

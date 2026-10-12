@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import LogList from '../../components/LogList.astro';
+import { getProjects, getLogs } from '../../lib/content';
+
+const logs = await getLogs();
+const projectTitles = Object.fromEntries((await getProjects()).map((p) => [p.id, p.data.title]));
+---
+
+<Base title="제작기" description="사이드 프로젝트를 만들면서 정한 것, 막힌 것, 알게 된 것">
+  <div class="container page">
+    <h1>제작기</h1>
+    <p class="muted lede">만들면서 정한 것, 막힌 것, 알게 된 것을 날짜순으로 적어요.</p>
+    <div class="list">
+      <LogList logs={logs} projectTitles={projectTitles} />
+    </div>
+  </div>
+</Base>
+
+<style>
+  .page { padding-top: var(--space-xl); }
+  h1 { font-size: var(--text-2xl); }
+  .lede { margin: var(--space-xs) 0 var(--space-xl); max-width: 34rem; }
+  .list { max-width: 42rem; }
+</style>

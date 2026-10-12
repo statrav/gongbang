@@ -1,0 +1,52 @@
+/* 마크다운 본문. 모눈 위에 흰 종이 한 장을 올린 모양이라 긴 글도 선에 걸리지 않는다 */
+.sheet {
+  background: var(--color-sheet);
+  border: var(--rule) solid var(--color-ink);
+  padding: var(--space-lg) var(--space-md) var(--space-xl);
+}
+@media (min-width: 640px) {
+  .sheet { padding: var(--space-xl) var(--space-2xl) var(--space-2xl); }
+}
+
+.prose { max-width: var(--measure); font-size: var(--text-base); line-height: 1.85; }
+.prose > * { margin-block: 0; }
+.prose > * + * { margin-top: var(--space-md); }
+.prose h2 { font-size: var(--text-xl); }
+.prose h3 { font-size: var(--text-lg); }
+.prose > * + h2 { margin-top: var(--space-xl); }
+.prose > * + h3 { margin-top: var(--space-lg); }
+.prose h2 + *, .prose h3 + * { margin-top: var(--space-sm); }
+.prose ul, .prose ol { padding-left: 1.25em; }
+.prose li + li { margin-top: var(--space-2xs); }
+.prose li::marker { color: var(--color-graphite); }
+.prose strong { font-weight: 600; }
+.prose mark { background: linear-gradient(transparent 55%, var(--color-marker) 55%); color: inherit; }
+.prose blockquote {
+  margin-inline: 0;
+  padding-left: var(--space-md);
+  border-left: 3px solid var(--color-accent);
+  color: var(--color-graphite);
+}
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--color-paper);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius);
+}
+.prose pre {
+  overflow-x: auto;
+  padding: var(--space-md);
+  border: 1px solid var(--color-grid);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+.prose pre code { background: none; padding: 0; }
+/* 휴대폰 캡처처럼 세로로 긴 그림은 높이로 줄이고, 가로로 넓은 그림은 폭에 맞춘다 */
+.prose img { display: block; width: auto; height: auto; max-width: 100%; max-height: 36rem; border: 1px solid var(--color-grid); }
+.prose figure { margin-inline: 0; }
+.prose figcaption { font-size: var(--text-sm); color: var(--color-graphite); margin-top: var(--space-xs); }
+.prose hr { border: 0; border-top: 1px dashed var(--color-graphite); margin-block: var(--space-xl); }
+.prose table { display: block; overflow-x: auto; border-collapse: collapse; font-size: var(--text-sm); }
+.prose th, .prose td { text-align: left; padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--color-grid); }
+.prose th { color: var(--color-graphite); font-weight: 500; }
