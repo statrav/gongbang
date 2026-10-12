@@ -3,7 +3,6 @@ import Base from '../layouts/Base.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import LogList from '../components/LogList.astro';
 import { getProjects, getLogs } from '../lib/content';
-import { SITE } from '../lib/site';
 import { url } from '../lib/url';
 
 const projects = await getProjects();
@@ -16,7 +15,8 @@ const projectTitles = Object.fromEntries(projects.map((p) => [p.id, p.data.title
   <div class="container home">
     <section class="hero">
       <h1>퇴근 후<br />공방</h1>
-      <p>{SITE.description}</p>
+      <!-- 넓은 화면은 한 줄, 좁은 화면은 쉼표 뒤에서만 줄을 바꾼다 -->
+      <p><span>퇴근하고 만드는 작은 도구들과,</span> <span>만들면서 알게 된 것들을 적어 둡니다.</span></p>
     </section>
 
     {onBench.length > 0 && (
@@ -44,7 +44,8 @@ const projectTitles = Object.fromEntries(projects.map((p) => [p.id, p.data.title
     letter-spacing: -0.02em;
     overflow-wrap: anywhere;
   }
-  .hero p { margin: var(--space-md) 0 0; max-width: 30rem; color: var(--color-graphite); font-size: var(--text-lg); line-height: 1.6; }
+  .hero p { margin: var(--space-md) 0 0; color: var(--color-graphite); font-size: var(--text-lg); line-height: 1.6; }
+  .hero p span { display: inline-block; text-wrap: balance; }
   .bench { display: grid; gap: var(--space-md); max-width: 36rem; }
   .logs { max-width: 42rem; }
   .logs-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-md); margin-bottom: var(--space-sm); }

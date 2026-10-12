@@ -19,7 +19,14 @@
 .prose ul, .prose ol { padding-left: 1.25em; }
 .prose li + li { margin-top: var(--space-2xs); }
 .prose li::marker { color: var(--color-graphite); }
-.prose strong { font-weight: 600; }
+/* 굵게(**...**) = 형광펜. 강조한 곳만 이어 읽어도 뜻이 통하게 쓴다 */
+.prose strong {
+  font-weight: 600;
+  background: linear-gradient(transparent 58%, var(--color-marker) 58%);
+  padding-inline: 0.08em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
 .prose mark { background: linear-gradient(transparent 55%, var(--color-marker) 55%); color: inherit; }
 .prose blockquote {
   margin-inline: 0;
@@ -48,5 +55,5 @@
 .prose figcaption { font-size: var(--text-sm); color: var(--color-graphite); margin-top: var(--space-xs); }
 .prose hr { border: 0; border-top: 1px dashed var(--color-graphite); margin-block: var(--space-xl); }
 .prose table { display: block; overflow-x: auto; border-collapse: collapse; font-size: var(--text-sm); }
-.prose th, .prose td { text-align: left; padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--color-grid); }
+.prose th, .prose td { overflow-wrap: normal; text-align: left; padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--color-grid); }
 .prose th { color: var(--color-graphite); font-weight: 500; }
