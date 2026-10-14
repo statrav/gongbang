@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- era-life design/ddakji.html을 블로그에서 해 보도록 EMBED 모드로 옮긴 것. 끝나면 다시 할 수 있게 다시 단추를 보인다 -->
+<script>window.EMBED = { era: null }</script>
+<style>html.embed body #again { display: revert !important; }</style>
+<title>딱지치기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 한 열(최대 560px). 판(골목 바닥 위 딱지) 아래 조작 칸이 차례로 바뀜: 가위바위보 → 치는 방법 고르기 → 힘 막대 → 결과 한 줄과 수첩 카드 → 규칙 메모 */
+:root {
+  --paper: #eceeea; --sheet: #f8f9f6; --ink: #1d2628; --muted: #5b6668; --rule: #d2d7d2;
+  --accent: #2c4c8c; --accent-soft: #e1e7f2; --memo: #9a4f2b; --memo-soft: #f6e8df;
+  --ground: #cfc6b0; --ground-2: #c2b89f; --mine: #3e6a9a; --mine-2: #c9483b; --cover: #7d4a36; --cover-2: #a7684d; --note: #ebe6d4; --note-2: #b9c3cf;
+  --zone: #2c4c8c; --warn: #b0452a;
+  --f-story: "Gowun Batang", "Nanum Myeongjo", serif;
+  --f-ui: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+    --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+    --ground: #4a4436; --ground-2: #403a2e; --mine: #5f8cc0; --mine-2: #d9705f; --cover: #8e5a44; --cover-2: #b57a5e; --note: #cfc9b6; --note-2: #8f9aa6;
+    --zone: #93aee6; --warn: #ef8a6c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+  --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+  --ground: #4a4436; --ground-2: #403a2e; --mine: #5f8cc0; --mine-2: #d9705f; --cover: #8e5a44; --cover-2: #b57a5e; --note: #cfc9b6; --note-2: #8f9aa6;
+  --zone: #93aee6; --warn: #ef8a6c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--paper); }
+body { color: var(--ink); font: 15px/1.6 var(--f-ui); word-break: keep-all; overflow-wrap: break-word; padding-inline: 16px; padding-block: 28px 64px; margin: 0; }
+.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 22px; }
+h1 { font-family: var(--f-story); margin: 0; text-wrap: balance; font-size: clamp(24px, 6vw, 32px); }
+p { margin: 0; }
+.lead { color: var(--muted); font-family: var(--f-story); font-size: 16px; }
+.tag { justify-self: start; font-size: 12px; color: var(--muted); border: 1px dashed var(--muted); border-radius: 4px; padding: 2px 8px; }
+.when { font: 500 13px var(--f-num); color: var(--memo); }
+button { font: inherit; color: inherit; cursor: pointer; border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 11px 14px; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.primary { background: var(--accent); color: var(--sheet); border-color: var(--accent); font-weight: 600; }
+a { color: var(--memo); }
+
+.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 18px; display: grid; gap: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .08); }
+.panel .story { font: 17px/1.7 var(--f-story); }
+svg { display: block; width: 100%; height: auto; max-width: 420px; margin: 0 auto; }
+.say { text-align: center; font: 16px/1.6 var(--f-story); min-height: 3.2em; display: grid; place-items: center; }
+.say.warn { color: var(--warn); }
+.ctl { display: grid; gap: 8px; }
+.three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.two button { display: grid; gap: 2px; text-align: left; }
+.two b { font: 700 16px var(--f-story); }
+.two small { color: var(--muted); font-size: 12px; }
+.three button { font-size: 16px; }
+.power { position: relative; height: 22px; border-radius: 11px; background: var(--rule); overflow: hidden; }
+.power .zone { position: absolute; top: 0; bottom: 0; background: var(--zone); opacity: .35; }
+.power .mark { position: absolute; top: -2px; bottom: -2px; width: 4px; margin-left: -2px; background: var(--ink); border-radius: 2px; }
+.strike { font-size: 17px; padding: 13px; }
+
+.card { border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; background: var(--memo-soft); }
+.card .k { font-size: 12px; color: var(--memo); font-weight: 600; letter-spacing: .04em; }
+.card b { font: 700 17px var(--f-story); }
+.card p { font: 15px/1.7 var(--f-story); }
+.card .src { font-size: 12px; }
+.note { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; font-size: 14px; }
+.note ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+
+/* 데모 안(iframe)에서 열리면: 제목·설명·해·다시 단추를 숨기고 판만 보인다 */
+html.embed body { padding-block: 10px 16px; }
+html.embed .tag, html.embed h1, html.embed .lead, html.embed .note, html.embed #again, html.embed .tabs, html.embed .when, html.embed .card { display: none !important; }
+html.embed .wrap { gap: 12px; }
+</style>
+
+<script>if (window.EMBED) document.documentElement.classList.add('embed');</script>
+<main class="wrap">
+  <span class="tag">시안 · 미니게임 · 딱지치기</span>
+  <h1>넘기면 내 것</h1>
+  <p class="lead">1964년에 태어난 아이의 1972년, 8살 때예요. 골목에서 친구와 딱지치기를 해요.</p>
+
+  <section class="panel" id="play">
+    <span class="when">1972 · 8살 · 골목</span>
+    <p class="story">달력 종이로 접은 왕딱지를 들고 나갔습니다.</p>
+    <svg id="svg" viewBox="0 0 300 200" role="img" aria-label="골목 바닥에 놓인 딱지"></svg>
+    <p class="say" id="say" aria-live="polite"></p>
+    <div class="ctl" id="ctl-rps">
+      <div class="three"><button data-rps="0">가위</button><button data-rps="1">바위</button><button data-rps="2">보</button></div>
+    </div>
+    <div class="ctl" id="ctl-how" hidden>
+      <div class="two">
+        <button data-how="belly"><b>배꼽치기</b><small>가운데를 내리쳐요</small></button>
+        <button data-how="wind"><b>바람치기</b><small>옆을 쳐서 바람으로 넘겨요</small></button>
+      </div>
+    </div>
+    <div class="ctl" id="ctl-hit" hidden>
+      <div class="power" id="power"><span class="zone" id="zone"></span><span class="mark" id="mark"></span></div>
+      <button class="primary strike" id="strike">딱!</button>
+    </div>
+    <div class="ctl" id="ctl-next" hidden><button class="primary" id="next">계속</button></div>
+  </section>
+
+  <section class="panel" id="done" hidden>
+    <span class="when">1972 · 8살</span>
+    <p class="story" id="done-line"></p>
+    <div class="card">
+      <span class="k">추억 수첩에 넣었습니다 · 놀이</span>
+      <b>딱지치기</b>
+      <p id="card-line"></p>
+      <span class="src">출처: <a href="https://folkency.nfm.go.kr/topic/detail/11931" target="_blank" rel="noopener">딱지치기–국립민속박물관 한국민속대백과사전</a></span>
+    </div>
+    <button id="again">다시</button>
+  </section>
+
+  <div class="note">
+    <b>미니게임 규칙</b>
+    <ul>
+      <li>사실만: 넘겨먹기. 가위바위보로 먼저 칠 사람을 정하고, 진 사람이 딱지를 내려놓으면 이긴 사람이 쳐서 뒤집히면 딴다. 안 넘어가면 상대 차례 (한국민속대백과사전 「딱지치기」)</li>
+      <li>판단: 두툼한 딱지는 가운데를 내리치는 배꼽치기, 얇은 딱지는 그냥 내리쳐서는 안 넘어가서 옆을 치는 바람치기. 바람치기가 더 어려워서 힘 막대의 맞는 칸이 좁아요 (같은 출처)</li>
+      <li>딱지 재료(헌책 표지, 공책, 달력)와 왕딱지(크고 두꺼운 종이)도 같은 출처. 친구 딱지가 두툼할지 얇을지는 무작위</li>
+      <li>점수·순위 없음. 내가 몇 번 쳤는지는 보여 주지 않고, 땄는지·잃었는지·그만했는지만 수첩에 한 줄로</li>
+      <li>게임 규칙(출처에 없음): 친구가 칠 때 넘어갈지는 무작위, 내가 세 번 쳐도 승부가 안 나면 그만해요</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const S = (tag, a, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const RPS = ['가위', '바위', '보'];
+  const ZONE = { belly: .26, wind: .15 };   // 맞는 칸 너비 (바람치기가 더 어려움)
+  const FRIEND_FLIP = .35, MAX_TRIES = 3;   // 게임 규칙: 출처 없음
+  let friend, tries, raf, pos, dir, zoneAt, how, last;
+  const svg = $('svg');
+
+  // 접은 딱지: 정사각형에 접힌 선 (앞면은 X자 날개, 뒷면은 가운데 사각)
+  function ddakji(g, size, fill, line, back) {
+    const h = size / 2;
+    S('rect', { x: -h, y: -h, width: size, height: size, rx: 2, fill, stroke: 'var(--ink)', 'stroke-width': 1.4 }, g);
+    if (back) S('rect', { x: -h * .55, y: -h * .55, width: size * .55, height: size * .55, fill: 'none', stroke: line, 'stroke-width': 1.4, transform: 'rotate(45)' }, g);
+    else { S('path', { d: `M${-h} ${-h}L${h} ${h}M${h} ${-h}L${-h} ${h}`, stroke: line, 'stroke-width': 1.4 }, g); S('rect', { x: -h * .3, y: -h * .3, width: h * .6, height: h * .6, fill: line, opacity: .5 }, g); }
+  }
+  function draw(target) {
+    svg.replaceChildren();
+    S('rect', { x: 0, y: 0, width: 300, height: 200, rx: 12, fill: 'var(--ground)' }, svg);
+    for (let i = 0; i < 36; i++) S('circle', { cx: (i * 83) % 300, cy: (i * 47) % 200, r: 1.2, fill: 'var(--ground-2)' }, svg);
+    S('ellipse', { cx: 150, cy: 138, rx: 50, ry: 10, fill: 'var(--ink)', opacity: .12 }, svg);
+    const t = S('g', { id: 'target', transform: 'translate(150 120)' }, svg);
+    const inner = S('g', { id: 'target-in' }, t);
+    if (target === 'mine') ddakji(inner, 80, 'var(--mine)', 'var(--mine-2)', false);
+    else if (friend === 'thick') ddakji(inner, 72, 'var(--cover)', 'var(--cover-2)', false);
+    else ddakji(inner, 72, 'var(--note)', 'var(--note-2)', false);
+    if (target !== 'mine') S('text', { x: 150, y: 186, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--muted)', 'font-family': 'var(--f-ui)' }, svg).textContent = friend === 'thick' ? '친구 딱지 · 헌책 표지로 접어 두툼함' : '친구 딱지 · 공책 종이로 접어 얇음';
+    else S('text', { x: 150, y: 186, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--muted)', 'font-family': 'var(--f-ui)' }, svg).textContent = '내 왕딱지 · 달력 종이';
+    const hit = S('g', { id: 'hitter', opacity: 0 }, svg);
+    if (target === 'mine') ddakji(hit, 66, 'var(--cover)', 'var(--cover-2)', false); else ddakji(hit, 80, 'var(--mine)', 'var(--mine-2)', false);
+  }
+  // 치는 딱지가 위에서 떨어짐 → 결과에 따라 바닥 딱지가 뒤집힘
+  function slam(at, flip, done) {
+    const h = $('hitter'), tin = $('target-in'), x0 = at === 'wind' ? 205 : 150, y1 = at === 'wind' ? 128 : 112;
+    const t0 = performance.now();
+    h.setAttribute('opacity', 1);
+    (function f(now) {
+      const t = Math.min(1, (now - t0) / 260);
+      h.setAttribute('transform', `translate(${x0} ${-40 + (y1 + 40) * t * t}) rotate(${at === 'wind' ? -18 : 0})`);
+      if (t < 1) return requestAnimationFrame(f);
+      if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
+      setTimeout(() => h.setAttribute('opacity', 0), 450);  // 친 딱지는 잠깐 보이고 걷어 냄
+      if (!flip) { tin.setAttribute('transform', 'translate(0 -4)'); setTimeout(() => { tin.removeAttribute('transform'); done(); }, 160); return; }
+      const t1 = performance.now();
+      (function g(n) {
+        const u = Math.min(1, (n - t1) / 420), sy = Math.cos(u * Math.PI), lift = Math.sin(u * Math.PI) * 34;
+        tin.setAttribute('transform', `translate(0 ${-lift}) scale(1 ${sy.toFixed(3)})`);
+        if (u < 1) return requestAnimationFrame(g);
+        tin.replaceChildren(); const back = $('target').dataset.mine ? ['var(--mine)', 'var(--mine-2)', 80] : friend === 'thick' ? ['var(--cover)', 'var(--cover-2)', 72] : ['var(--note)', 'var(--note-2)', 72];
+        ddakji(tin, back[2], back[0], back[1], true); tin.removeAttribute('transform'); done();
+      })(t1);
+    })(t0);
+  }
+
+  const say = (t, warn) => { $('say').textContent = t; $('say').classList.toggle('warn', !!warn); };
+  const show = id => ['ctl-rps', 'ctl-how', 'ctl-hit', 'ctl-next'].forEach(c => $(c).hidden = c !== id);
+
+  function start() {
+    friend = Math.random() < .5 ? 'thick' : 'thin'; tries = 0; cancelAnimationFrame(raf);
+    $('play').hidden = false; $('done').hidden = true;
+    draw('friend'); say('누가 먼저 칠까? 가위바위보!'); show('ctl-rps');
+  }
+  function rps(me) {
+    const fr = Math.floor(Math.random() * 3), r = (me - fr + 3) % 3;
+    if (r === 0) return say(`${RPS[me]}, ${RPS[fr]}. 비겼다! 다시.`);
+    if (r === 2) { say(`${RPS[me]}, ${RPS[fr]}. 이겼다! 친구가 딱지를 내려놓았어요. 어떻게 칠까?`); return myTurn(); }
+    say(`${RPS[me]}, ${RPS[fr]}. 졌다. 내 왕딱지를 내려놓아요.`); show(null); setTimeout(friendTurn, 900);
+  }
+  function myTurn() { draw('friend'); show('ctl-how'); }
+  function chooseHow(h) {
+    how = h; const w = ZONE[h]; zoneAt = .1 + Math.random() * (.8 - w);
+    $('zone').style.left = (zoneAt * 100) + '%'; $('zone').style.width = (w * 100) + '%';
+    say(h === 'belly' ? '가운데를 노려요. 막대가 파란 칸에 오면 딱!' : '옆을 노려요. 칸이 좁아요. 파란 칸에 오면 딱!');
+    show('ctl-hit'); pos = 0; dir = 1; last = null; raf = requestAnimationFrame(swing); $('strike').focus();
+  }
+  function swing(now) {
+    if (last != null) { pos += dir * (now - last) / 900; if (pos > 1) { pos = 2 - pos; dir = -1; } if (pos < 0) { pos = -pos; dir = 1; } }
+    last = now; $('mark').style.left = (pos * 100) + '%'; raf = requestAnimationFrame(swing);
+  }
+  function strike() {
+    cancelAnimationFrame(raf); tries++; show(null);
+    const inZone = pos >= zoneAt && pos <= zoneAt + ZONE[how];
+    const flip = inZone && !(friend === 'thin' && how === 'belly');
+    slam(how, flip, () => {
+      if (flip) return end('win');
+      if (friend === 'thin' && how === 'belly' && inZone) say('얇은 딱지라 내리쳐서는 안 넘어가요. 바람치기로!', true);
+      else say(inZone ? '안 넘어갔어요.' : (how === 'wind' ? '바람이 빗나갔어요.' : '힘이 빗나갔어요.'), true);
+      if (tries >= MAX_TRIES) return setTimeout(() => end('stop'), 1100);
+      setTimeout(() => { say('친구 차례. 내 왕딱지를 내려놓아요.'); setTimeout(friendTurn, 700); }, 1100);
+    });
+  }
+  function friendTurn() {
+    draw('mine'); $('target').dataset.mine = '1';
+    const flip = Math.random() < FRIEND_FLIP;
+    say('친구가 배꼽치기!');
+    setTimeout(() => slam('belly', flip, () => {
+      if (flip) return end('lose');
+      say('왕딱지는 버텼어요. 이제 내 차례!'); show('ctl-next');
+    }), 500);
+  }
+  function end(r) {
+    const line = r === 'win' ? `달력 종이로 접은 왕딱지로 친구 딱지를 넘겨 땄습니다.`
+      : r === 'lose' ? '친구가 내 왕딱지를 넘겨 가져갔습니다.'
+      : '서로 넘기지 못하고 딱지치기를 그만했습니다.';
+    setTimeout(() => {
+      $('play').hidden = true; $('done').hidden = false;
+      $('done-line').textContent = line; if (window.EMBED) parent.postMessage({ type: 'era-game', line: line }, '*'); $('card-line').textContent = `1972년, 8살. 골목에서 ${line}`;
+      $('again').focus();
+    }, r === 'stop' ? 0 : 900);
+  }
+
+  document.querySelectorAll('[data-rps]').forEach(b => b.addEventListener('click', () => rps(+b.dataset.rps)));
+  document.querySelectorAll('[data-how]').forEach(b => b.addEventListener('click', () => chooseHow(b.dataset.how)));
+  $('strike').addEventListener('click', strike);
+  $('next').addEventListener('click', () => { say('어떻게 칠까?'); myTurn(); });
+  $('again').addEventListener('click', start);
+  start();
+})();
+</script>

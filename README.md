@@ -34,6 +34,7 @@ draft: true              # 다 쓰면 지운다. true면 배포되지 않는다
 
 - 캡처는 반드시 가상 데이터로 찍는다 (account-pro: `npm run db:demo` → `npm run dev:demo`)
 - 본문에서 `<mark>강조</mark>`는 형광펜으로 나온다
+- 글 안에서 해 보는 미니게임: `<details class="play"><summary>이름 해 보기</summary><iframe src="../../games/<이름>.html" title="…" loading="lazy"></iframe></details>`. 펼치기 전에는 게임을 불러오지 않는다. 게임 파일(`public/games/`)은 era-life의 `design/`에서 `node scripts/copy-era-life-games.mjs`로 옮긴다 (게임을 고치면 다시 실행)
 
 ## 화면
 

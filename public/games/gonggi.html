@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- era-life design/gonggi.html을 블로그에서 해 보도록 EMBED 모드로 옮긴 것. 끝나면 다시 할 수 있게 다시 단추를 보인다 -->
+<script>window.EMBED = { era: null }</script>
+<style>html.embed body #again { display: revert !important; }</style>
+<title>공기놀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 한 열(최대 560px). 시대 고르기(1938년생 / 1994년생) → 판(던지기 버튼, 바닥 돌 탭) → 결과 한 줄과 수첩 카드 → 규칙 메모 */
+:root {
+  --paper: #eceeea; --sheet: #f8f9f6; --ink: #1d2628; --muted: #5b6668; --rule: #d2d7d2;
+  --accent: #2c4c8c; --accent-soft: #e1e7f2; --memo: #9a4f2b; --memo-soft: #f6e8df;
+  --ground: #cfc6b0; --ground-2: #c2b89f; --desk: #c9a678; --desk-2: #b9946a; --stone: #8d8f88; --stone-hi: #b4b6ae; --palm: #efe0c8;
+  --target: #2c4c8c; --warn: #b0452a;
+  --f-story: "Gowun Batang", "Nanum Myeongjo", serif;
+  --f-ui: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+    --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+    --ground: #4a4436; --ground-2: #403a2e; --desk: #6b5338; --desk-2: #5c472f; --stone: #a3a59d; --stone-hi: #c9cbc3; --palm: #8f7f68;
+    --target: #93aee6; --warn: #ef8a6c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+  --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+  --ground: #4a4436; --ground-2: #403a2e; --desk: #6b5338; --desk-2: #5c472f; --stone: #a3a59d; --stone-hi: #c9cbc3; --palm: #8f7f68;
+  --target: #93aee6; --warn: #ef8a6c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--paper); }
+body { color: var(--ink); font: 15px/1.6 var(--f-ui); word-break: keep-all; overflow-wrap: break-word; padding-inline: 16px; padding-block: 28px 64px; margin: 0; }
+.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 22px; }
+h1 { font-family: var(--f-story); margin: 0; text-wrap: balance; font-size: clamp(24px, 6vw, 32px); }
+p { margin: 0; }
+.lead { color: var(--muted); font-family: var(--f-story); font-size: 16px; }
+.tag { justify-self: start; font-size: 12px; color: var(--muted); border: 1px dashed var(--muted); border-radius: 4px; padding: 2px 8px; }
+.when { font: 500 13px var(--f-num); color: var(--memo); }
+button { font: inherit; color: inherit; cursor: pointer; border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 11px 14px; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:disabled { cursor: default; opacity: .5; }
+.primary { background: var(--accent); color: var(--sheet); border-color: var(--accent); font-weight: 600; }
+.quiet { background: transparent; color: var(--muted); font-size: 13px; padding: 6px 10px; }
+a { color: var(--memo); }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tabs button { padding: 5px 12px; font-size: 13px; border-radius: 14px; }
+.tabs button[aria-pressed="true"] { background: var(--accent); color: var(--sheet); border-color: var(--accent); }
+
+.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 18px; display: grid; gap: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .08); }
+.panel .story { font: 17px/1.7 var(--f-story); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+.steps { display: flex; gap: 4px; flex-wrap: wrap; }
+.steps span { font-size: 12px; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--rule); color: var(--muted); }
+.steps span.now { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.steps span.ok { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+svg { display: block; width: 100%; height: auto; max-width: 420px; margin: 0 auto; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.hint { text-align: center; color: var(--muted); font-size: 14px; min-height: 1.6em; }
+.hint.warn { color: var(--warn); font-weight: 600; }
+.toss { justify-self: center; min-width: 160px; font-size: 16px; padding: 12px 20px; }
+
+.card { border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; background: var(--memo-soft); }
+.card .k { font-size: 12px; color: var(--memo); font-weight: 600; letter-spacing: .04em; }
+.card b { font: 700 17px var(--f-story); }
+.card p { font: 15px/1.7 var(--f-story); }
+.card .src { font-size: 12px; }
+.note { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; font-size: 14px; }
+.note ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+.stone { transition: transform .22s ease; }
+.ring { animation: ring 1s ease-in-out infinite; }
+@keyframes ring { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .stone { transition: none; } .ring { animation: none; } }
+
+/* 데모 안(iframe)에서 열리면: 제목·설명·해·다시 단추를 숨기고 판만 보인다 */
+html.embed body { padding-block: 10px 16px; }
+html.embed .tag, html.embed h1, html.embed .lead, html.embed .note, html.embed #again, html.embed .tabs, html.embed .when, html.embed .card { display: none !important; }
+html.embed .wrap { gap: 12px; }
+</style>
+
+<script>if (window.EMBED) document.documentElement.classList.add('embed');</script>
+<main class="wrap">
+  <span class="tag">시안 · 미니게임 · 공기놀이</span>
+  <h1>던지고, 줍고, 받기</h1>
+  <p class="lead">공기놀이는 1930년대생에게도 1990년대생에게도 있던 놀이예요. 같은 놀이를 다른 시대에서 해 봐요.</p>
+  <div class="tabs" role="group" aria-label="시대">
+    <button data-era="1938" aria-pressed="true">1938년생 · 1946년</button>
+    <button data-era="1994" aria-pressed="false">1994년생 · 2002년</button>
+  </div>
+
+  <section class="panel" id="play">
+    <span class="when" id="when"></span>
+    <p class="story" id="scene"></p>
+    <div class="steps" id="steps"></div>
+    <svg id="svg" viewBox="0 0 300 280" role="img" aria-label="공기 판. 던진 돌이 떨어지기 전에 파랗게 표시된 바닥 돌을 눌러요"></svg>
+    <p class="hint" id="hint" aria-live="polite"></p>
+    <button class="primary toss" id="toss">던지기</button>
+    <div class="row"><span></span><button class="quiet" id="stop">그만하기</button></div>
+  </section>
+
+  <section class="panel" id="done" hidden>
+    <span class="when" id="done-when"></span>
+    <p class="story" id="done-line"></p>
+    <div class="card">
+      <span class="k">추억 수첩에 넣었습니다 · 놀이</span>
+      <b>공기놀이</b>
+      <p id="card-line"></p>
+      <span class="src">출처: <a href="https://encykorea.aks.ac.kr/Article/E0004249" target="_blank" rel="noopener">공기놀이 - 한국민족문화대백과사전</a></span>
+    </div>
+    <button id="again">다시</button>
+  </section>
+
+  <div class="note">
+    <b>미니게임 규칙</b>
+    <ul>
+      <li>사실만: 다섯 알 중 한 알을 던져 올리고, 떨어지기 전에 바닥 돌과 함께 잡는다. 한 알씩 네 번 → 두 알씩 두 번 → 세 알과 한 알 → 네 알 쓸어잡기. 옆 돌을 건드리거나 내려오는 돌을 못 잡으면 실격이고 차례가 넘어간다 (한국민족문화대백과사전 「공기놀이」)</li>
+      <li>조작: "던지기"를 누르고, 돌이 떠 있는 동안 파랗게 표시된 바닥 돌을 하나씩 눌러요. 두 알·세 알·네 알도 한 알씩 따닥따닥. 다른 돌을 누르면 건드린 것, 다 못 누르면 못 잡은 것</li>
+      <li>점수·순위 없음. 출처의 "몇 년" 셈도 넣지 않았어요. 어디까지 했는지만 수첩에 한 줄로</li>
+      <li>뺀 것: 다섯째 단계(손등으로 받아 채어잡기)는 손가락 하나로 하기엔 복잡해서 시안에서 뺐어요</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const S = (tag, a, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  // 시대별 장면: 문장은 문화 자료(data/culture)의 line, 사실은 같은 출처
+  const ERA = {
+    1938: { when: '1946 · 8살', scene: '작은 돌 다섯 개를 주워 공기놀이를 했습니다.', floor: 'ground' },
+    1994: { when: '2002 · 8살', scene: '쉬는 시간에 친구들과 공기놀이를 했습니다.', floor: 'desk' },
+  };
+  // 단계: 한 번 던질 때 잡을 돌 묶음들, fly는 돌이 떠 있는 시간(ms)
+  const STEPS = [
+    { name: '한 알씩', groups: [1, 1, 1, 1], fly: 1300 },
+    { name: '두 알씩', groups: [2, 2], fly: 1400 },
+    { name: '세 알·한 알', groups: [3, 1], fly: 1500 },
+    { name: '네 알 쓸기', groups: [4], fly: 1600 },
+  ];
+  const HAND = [150, 250], HIT = 24;
+  let era = window.EMBED?.era || '1938', stones, step, throwIdx, state, flight, raf, startT;
+  const svg = $('svg');
+
+  function place() {
+    // 바닥 돌 네 개: 매번 무작위 자리, 서로 44 넘게 떨어지게
+    const out = [];
+    while (out.length < 4) {
+      const x = 50 + Math.random() * 200, y = 70 + Math.random() * 110;
+      if (out.every(p => Math.hypot(p.x - x, p.y - y) > 44)) out.push({ x, y, picked: false, el: null });
+    }
+    return out;
+  }
+  function draw() {
+    svg.replaceChildren();
+    const f = ERA[era].floor;
+    S('rect', { x: 0, y: 0, width: 300, height: 280, rx: 12, fill: `var(--${f})` }, svg);
+    if (f === 'desk') for (let y = 30; y < 280; y += 46) S('path', { d: `M0 ${y} Q150 ${y + 6} 300 ${y}`, fill: 'none', stroke: 'var(--desk-2)', 'stroke-width': 1.2 }, svg);
+    else for (let i = 0; i < 40; i++) S('circle', { cx: (i * 73) % 300, cy: (i * 41) % 280, r: 1.2, fill: 'var(--ground-2)' }, svg);
+    S('ellipse', { cx: HAND[0], cy: HAND[1] + 6, rx: 34, ry: 14, fill: 'var(--palm)', stroke: 'var(--ink)', 'stroke-width': 1.2 }, svg);
+    S('g', { id: 'rings' }, svg);
+    stones.forEach((s, i) => { s.el = stone(s.x, s.y); s.el.dataset.i = i; });
+    const sh = S('ellipse', { id: 'shadow', cx: HAND[0], cy: HAND[1], rx: 7, ry: 3, fill: 'var(--ink)', opacity: 0 }, svg);
+    const fly = stone(HAND[0], HAND[1] - 4); fly.id = 'fly';
+  }
+  function stone(x, y) {
+    const g = S('g', { class: 'stone', transform: `translate(${x} ${y})` }, svg);
+    S('ellipse', { cx: 0, cy: 0, rx: 9, ry: 7.5, fill: 'var(--stone)', stroke: 'var(--ink)', 'stroke-width': 1.1 }, g);
+    S('ellipse', { cx: -3, cy: -2.5, rx: 3, ry: 2, fill: 'var(--stone-hi)' }, g);
+    return g;
+  }
+  // 이번에 잡을 돌: 아직 안 주운 돌 중 앞에서부터 n개 (가까운 것끼리 묶이게 x 순)
+  function targets() {
+    const n = STEPS[step].groups[throwIdx];
+    const left = stones.map((s, i) => i).filter(i => !stones[i].picked).sort((a, b) => stones[a].x - stones[b].x);
+    return left.slice(0, n);
+  }
+  function showTargets() { $('rings').replaceChildren(); if (state === 'fly') drawRings(flight.tg); }
+  function drawRings(ids) {
+    const g = $('rings'); g.replaceChildren();
+    ids.forEach(i => S('circle', { class: 'ring', cx: stones[i].x, cy: stones[i].y, r: 15, fill: 'none', stroke: 'var(--target)', 'stroke-width': 2.4 }, g));
+  }
+  function renderSteps() {
+    const w = $('steps'); w.replaceChildren();
+    STEPS.forEach((s, i) => { const e = document.createElement('span'); e.textContent = s.name; e.className = i < step ? 'ok' : i === step ? 'now' : ''; w.append(e); });
+  }
+
+  function start() {
+    stones = place(); step = 0; throwIdx = 0; state = 'ready'; cancelAnimationFrame(raf);
+    $('when').textContent = ERA[era].when; $('scene').textContent = ERA[era].scene;
+    draw(); renderSteps(); hint('"던지기"를 누르고, 돌이 떠 있는 동안 파란 동그라미 돌을 눌러요.');
+    $('toss').disabled = false; $('play').hidden = false; $('done').hidden = true;
+  }
+  function hint(t, warn) { $('hint').textContent = t; $('hint').classList.toggle('warn', !!warn); }
+
+  function toss() {
+    if (state !== 'ready') return;
+    state = 'fly'; flight = { got: false, tg: targets() }; startT = performance.now(); $('toss').disabled = true;
+    hint(flight.tg.length > 1 ? `지금! ${flight.tg.length}개를 따닥` : '지금!'); showTargets();
+    raf = requestAnimationFrame(frame);
+  }
+  function frame(now) {
+    const t = Math.min(1, (now - startT) / STEPS[step].fly), h = 175 * 4 * t * (1 - t);
+    $('fly').setAttribute('transform', `translate(${HAND[0]} ${HAND[1] - 4 - h})`);
+    const sh = $('shadow'); sh.setAttribute('opacity', (.25 * (1 - h / 175)).toFixed(2));
+    if (t < 1) { raf = requestAnimationFrame(frame); return; }
+    if (state !== 'fly') return;
+    if (!flight.got) return fail(flight.tg.some(i => stones[i].picked) ? '다 줍기 전에 돌이 내려왔어요.' : '내려오는 돌을 못 잡았어요.', 'catch');
+    // 받음
+    throwIdx++;
+    if (throwIdx >= STEPS[step].groups.length) {
+      step++; throwIdx = 0;
+      if (step >= STEPS.length) return finish(true);
+      // 다음 단계: 주운 돌을 다시 바닥에
+      stones = place(); draw(); hint(`${STEPS[step].name}! 다시 던져요.`);
+    } else hint('받았어요. 다시 던져요.');
+    state = 'ready'; renderSteps(); showTargets(); $('toss').disabled = false; $('toss').focus();
+  }
+
+  function tap(e) {
+    if (state !== 'fly' || flight.got) return;
+    const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY;
+    const q = p.matrixTransform(svg.getScreenCTM().inverse());
+    let best = -1, bd = Infinity;
+    stones.forEach((s, i) => { if (s.picked) return; const d = Math.hypot(s.x - q.x, s.y - q.y); if (d < bd) { bd = d; best = i; } });
+    if (best < 0 || bd > HIT) return;
+    if (!flight.tg.includes(best)) return fail('옆 돌을 건드렸어요.', 'touch');
+    // 묶음이라도 한 알씩 따로 눌러야 주워짐
+    const s = stones[best]; s.picked = true;
+    s.el.setAttribute('transform', `translate(${HAND[0] + (Math.random() - .5) * 30} ${HAND[1] + 2})`);
+    const left = flight.tg.filter(i => !stones[i].picked).length;
+    if (left === 0) { flight.got = true; $('rings').replaceChildren(); hint('다 주웠어요, 이제 받기!'); }
+    else { drawRings(flight.tg.filter(i => !stones[i].picked)); hint(`${left}개 더!`); }
+  }
+
+  function fail(msg, why) {
+    state = 'over'; cancelAnimationFrame(raf); hint(msg, true);
+    const at = STEPS[step].name;
+    const line = why === 'touch' ? `${at} 잡기에서 옆 돌을 건드려 차례를 넘겼습니다.` : `${at} 잡기에서 내려오는 돌을 못 잡아 차례를 넘겼습니다.`;
+    setTimeout(() => finish(false, line), 900);
+  }
+  function finish(ok, line) {
+    state = 'over'; cancelAnimationFrame(raf);
+    const l = ok ? '한 알씩, 두 알씩, 세 알, 네 알 쓸어잡기까지 실수 없이 했습니다.' : line;
+    $('play').hidden = true; $('done').hidden = false;
+    $('done-when').textContent = ERA[era].when; $('done-line').textContent = l; if (window.EMBED) parent.postMessage({ type: 'era-game', line: l }, '*');
+    $('card-line').textContent = `${ERA[era].when.replace(' · ', '년, ')}. ${ERA[era].scene} ${l}`;
+    $('again').focus();
+  }
+
+  svg.addEventListener('pointerdown', tap);
+  $('toss').addEventListener('click', toss);
+  $('stop').addEventListener('click', () => finish(false, `${STEPS[step].name} 잡기까지 하다가 그만했습니다.`));
+  $('again').addEventListener('click', start);
+  document.querySelectorAll('[data-era]').forEach(b => b.addEventListener('click', () => {
+    era = b.dataset.era; document.querySelectorAll('[data-era]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); start();
+  }));
+  start();
+})();
+</script>

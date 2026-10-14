@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- era-life design/sticker.html을 블로그에서 해 보도록 EMBED 모드로 옮긴 것. 끝나면 다시 할 수 있게 다시 단추를 보인다 -->
+<script>window.EMBED = { era: null }</script>
+<style>html.embed body #again { display: revert !important; }</style>
+<title>빵 스티커</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 한 열(최대 560px). 빵 봉지(손가락으로 가로질러 뜯기) → 나온 스티커 → 내 스티커 칸에 붙이기, 세 번 → 결과 한 줄과 수첩 카드 → 규칙 메모 */
+:root {
+  --paper: #eceeea; --sheet: #f8f9f6; --ink: #1d2628; --muted: #5b6668; --rule: #d2d7d2;
+  --accent: #2c4c8c; --accent-soft: #e1e7f2; --memo: #9a4f2b; --memo-soft: #f6e8df;
+  --bag: #e9c46a; --bag-2: #d39a4a; --bread: #d6a15e; --bread-2: #b97f3c; --foil: #f4f1e8;
+  --s1: #c9483b; --s2: #2c4c8c; --s3: #3f7a4a; --s4: #c9a85c; --s5: #7a5a9a; --s6: #2f8a8a;
+  --warn: #b0452a;
+  --f-story: "Gowun Batang", "Nanum Myeongjo", serif;
+  --f-ui: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+    --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+    --bag: #b8963f; --bag-2: #9a7330; --bread: #b98a4c; --bread-2: #8f6630; --foil: #d8d3c4;
+    --s1: #e07a6d; --s2: #93aee6; --s3: #8fc49a; --s4: #e0c27a; --s5: #b79ad6; --s6: #7fc9c9;
+    --warn: #ef8a6c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+  --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+  --bag: #b8963f; --bag-2: #9a7330; --bread: #b98a4c; --bread-2: #8f6630; --foil: #d8d3c4;
+  --s1: #e07a6d; --s2: #93aee6; --s3: #8fc49a; --s4: #e0c27a; --s5: #b79ad6; --s6: #7fc9c9;
+  --warn: #ef8a6c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--paper); }
+body { color: var(--ink); font: 15px/1.6 var(--f-ui); word-break: keep-all; overflow-wrap: break-word; padding-inline: 16px; padding-block: 28px 64px; margin: 0; }
+.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 22px; }
+h1 { font-family: var(--f-story); margin: 0; text-wrap: balance; font-size: clamp(24px, 6vw, 32px); }
+p { margin: 0; }
+.lead { color: var(--muted); font-family: var(--f-story); font-size: 16px; }
+.tag { justify-self: start; font-size: 12px; color: var(--muted); border: 1px dashed var(--muted); border-radius: 4px; padding: 2px 8px; }
+.when { font: 500 13px var(--f-num); color: var(--memo); }
+button { font: inherit; color: inherit; cursor: pointer; border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 11px 14px; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.primary { background: var(--accent); color: var(--sheet); border-color: var(--accent); font-weight: 600; }
+a { color: var(--memo); }
+.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 18px; display: grid; gap: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .08); }
+.panel .story { font: 17px/1.7 var(--f-story); }
+svg.board { display: block; width: 100%; height: auto; max-width: 420px; margin: 0 auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+.say { text-align: center; font: 16px/1.6 var(--f-story); min-height: 1.6em; }
+.book { border: 1px dashed var(--rule); border-radius: 10px; padding: 12px; display: grid; gap: 8px; }
+.book b { font: 700 15px var(--f-story); }
+.book .grid { display: flex; gap: 8px; flex-wrap: wrap; min-height: 56px; }
+.book .grid svg { width: 52px; height: 52px; }
+.book .empty { color: var(--muted); font-size: 13px; }
+.card { border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; background: var(--memo-soft); }
+.card .k { font-size: 12px; color: var(--memo); font-weight: 600; letter-spacing: .04em; }
+.card b { font: 700 17px var(--f-story); }
+.card p { font: 15px/1.7 var(--f-story); }
+.card .src { font-size: 12px; }
+.note { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; font-size: 14px; }
+.note ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+.pop { animation: pop .5s cubic-bezier(.2, .8, .2, 1) both; transform-box: fill-box; transform-origin: center; }
+@keyframes pop { from { transform: scale(.2) rotate(-20deg); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pop { animation: none; } }
+
+/* 데모 안(iframe)에서 열리면: 제목·설명·해·다시 단추를 숨기고 판만 보인다 */
+html.embed body { padding-block: 10px 16px; }
+html.embed .tag, html.embed h1, html.embed .lead, html.embed .note, html.embed #again, html.embed .tabs, html.embed .when, html.embed .card { display: none !important; }
+html.embed .wrap { gap: 12px; }
+</style>
+
+<script>if (window.EMBED) document.documentElement.classList.add('embed');</script>
+<main class="wrap">
+  <span class="tag">시안 · 미니게임 · 빵 스티커</span>
+  <h1>뜯자마자 스티커부터</h1>
+  <p class="lead">1998년에 태어난 아이의 2006년, 8살 때예요. 떼었다 붙였다 하는 스티커가 든 빵이 팔리던 마지막 해예요.</p>
+
+  <section class="panel" id="play">
+    <span class="when">2006 · 8살</span>
+    <p class="story" id="story"></p>
+    <svg class="board" id="svg" viewBox="0 0 300 200" role="img" aria-label="빵 봉지. 손가락으로 가로질러 그어 뜯어요"></svg>
+    <p class="say" id="say" aria-live="polite"></p>
+    <button class="primary" id="next" hidden>다음 빵</button>
+    <div class="book">
+      <b>내 스티커</b>
+      <div class="grid" id="grid"><span class="empty">아직 없어요</span></div>
+    </div>
+  </section>
+
+  <section class="panel" id="done" hidden>
+    <span class="when">2006 · 8살</span>
+    <p class="story" id="done-line"></p>
+    <div class="card">
+      <span class="k">추억 수첩에 넣었습니다 · 놀이</span>
+      <b>빵 스티커 모으기</b>
+      <p id="card-line"></p>
+      <span class="src">출처: <a href="https://www.kyeonggi.com/article/20220424580209" target="_blank" rel="noopener">[지지대] 포켓몬 빵 열풍 (경기일보, 2022-04-24)</a></span>
+    </div>
+    <button id="again">다시</button>
+  </section>
+
+  <div class="note">
+    <b>미니게임 규칙</b>
+    <ul>
+      <li>사실만: 떼었다 붙였다 하는 스티커가 빵 봉지에 무작위로 들어 있었고, 아이들은 스티커를 모으려고 빵을 샀다. 1998년 처음 나와 2006년 단종됐다가 다시 나왔다 (경기일보 2022-04-24)</li>
+      <li>조작: 봉지를 손가락으로 왼쪽에서 오른쪽으로 쭉 그어 뜯어요. 빵 세 개</li>
+      <li>그림은 상표·캐릭터 대신 별·번개 같은 일반 무늬. 1998~2006년에 스티커가 몇 종이었는지는 기사에 없어서 전체 칸 수를 보여 주지 않아요 (2022년 재출시 때는 159종)</li>
+      <li>그 시절 빵값은 기사에 없어서(1,500원은 2022년 값) 넣지 않았어요. 점수·순위 없음, 모은 스티커만 수첩에</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const S = (tag, a, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  // 일반 무늬 스티커 (캐릭터 아님)
+  const KINDS = [
+    { id: 'star', name: '별', c: 'var(--s4)', d: 'M0 -20 L6 -6 L21 -6 L9 3 L13 18 L0 9 L-13 18 L-9 3 L-21 -6 L-6 -6 Z' },
+    { id: 'bolt', name: '번개', c: 'var(--s4)', d: 'M4 -22 L-12 4 L0 4 L-4 22 L12 -4 L0 -4 Z' },
+    { id: 'drop', name: '물방울', c: 'var(--s2)', d: 'M0 -22 C10 -8 16 0 16 8 A16 16 0 0 1 -16 8 C-16 0 -10 -8 0 -22 Z' },
+    { id: 'leaf', name: '나뭇잎', c: 'var(--s3)', d: 'M-16 16 C-18 -6 0 -20 18 -18 C20 2 6 18 -16 16 Z M-16 16 L10 -10' },
+    { id: 'flame', name: '불꽃', c: 'var(--s1)', d: 'M0 -22 C8 -10 16 -4 14 8 A14 14 0 0 1 -14 8 C-14 0 -8 -4 -6 -12 C-2 -6 0 -6 0 -22 Z' },
+    { id: 'moon', name: '달', c: 'var(--s5)', d: 'M6 -20 A20 20 0 1 0 6 20 A14 14 0 1 1 6 -20 Z' },
+    { id: 'heart', name: '하트', c: 'var(--s1)', d: 'M0 18 L-16 2 A9 9 0 0 1 0 -10 A9 9 0 0 1 16 2 Z' },
+    { id: 'wave', name: '물결', c: 'var(--s6)', d: 'M-20 -4 Q-10 -14 0 -4 T20 -4 L20 14 L-20 14 Z' },
+  ];
+  const BREADS = 3;
+  let n, got, state, tear;
+  const svg = $('svg');
+  const say = t => { $('say').textContent = t; };
+
+  function sticker(parent, k, x, y, s = 1) {
+    const g = S('g', { transform: `translate(${x} ${y}) scale(${s})` }, parent);
+    S('circle', { r: 30, fill: 'var(--foil)', stroke: 'var(--ink)', 'stroke-width': 1.4 }, g);
+    S('circle', { r: 26, fill: 'none', stroke: 'var(--rule)', 'stroke-width': 1, 'stroke-dasharray': '3 3' }, g);
+    S('path', { d: k.d, fill: k.c, stroke: 'var(--ink)', 'stroke-width': 1.3, 'stroke-linejoin': 'round' }, g);
+    return g;
+  }
+  function bag() {
+    svg.replaceChildren(); state = 'bag'; tear = null;
+    S('rect', { x: 0, y: 0, width: 300, height: 200, rx: 12, fill: 'var(--paper)' }, svg);
+    const b = S('g', { id: 'bag' }, svg);
+    S('path', { d: 'M40 40 L260 40 L254 170 L46 170 Z', fill: 'var(--bag)', stroke: 'var(--ink)', 'stroke-width': 1.6, 'stroke-linejoin': 'round' }, b);
+    for (let x = 44; x < 258; x += 8) S('path', { d: `M${x} 40 l4 -6 l4 6`, fill: 'var(--bag)', stroke: 'var(--ink)', 'stroke-width': 1 }, b);
+    S('rect', { x: 92, y: 80, width: 116, height: 54, rx: 27, fill: 'var(--bread)', stroke: 'var(--ink)', 'stroke-width': 1.2, opacity: .9 }, b);
+    S('text', { x: 150, y: 158, 'text-anchor': 'middle', 'font-size': 12, 'font-family': 'var(--f-ui)', fill: 'var(--ink)' }, b).textContent = '스티커 1장 들어 있음';
+    S('path', { id: 'cut', d: 'M40 60', stroke: 'var(--ink)', 'stroke-width': 2, fill: 'none', 'stroke-dasharray': '5 3' }, svg);
+    S('path', { d: 'M24 60 l14 0 m-6 -5 l6 5 l-6 5', stroke: 'var(--muted)', 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' }, svg);
+    $('story').textContent = n === 0 ? '빵을 하나 샀습니다.' : '빵을 하나 더 샀습니다.';
+    say('봉지 윗부분을 왼쪽에서 오른쪽으로 쭉 그어요.');
+  }
+  const toSvg = e => { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const q = p.matrixTransform(svg.getScreenCTM().inverse()); return [q.x, q.y]; };
+  svg.addEventListener('pointerdown', e => {
+    if (state !== 'bag') return;
+    const [x, y] = toSvg(e); if (y < 25 || y > 110) return;
+    e.preventDefault(); svg.setPointerCapture(e.pointerId); tear = { x0: x, max: x, y };
+  });
+  svg.addEventListener('pointermove', e => {
+    if (state !== 'bag' || !tear) return;
+    const [x] = toSvg(e); tear.max = Math.max(tear.max, x);
+    document.getElementById('cut').setAttribute('d', `M${Math.max(40, tear.x0)} 60 L${Math.min(260, tear.max)} 60`);
+    if (tear.max - tear.x0 > 150) open();
+  });
+  svg.addEventListener('pointerup', () => { if (state === 'bag' && tear) { tear = null; document.getElementById('cut').setAttribute('d', 'M40 60'); say('끝까지 쭉 그어야 뜯겨요.'); } });
+
+  function open() {
+    state = 'open';
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (e) {}
+    const k = KINDS[Math.floor(Math.random() * KINDS.length)], dup = got.some(g => g.id === k.id);
+    got.push(k); n++;
+    svg.replaceChildren();
+    S('rect', { x: 0, y: 0, width: 300, height: 200, rx: 12, fill: 'var(--paper)' }, svg);
+    S('path', { d: 'M40 70 L260 70 L254 170 L46 170 Z', fill: 'var(--bag)', stroke: 'var(--ink)', 'stroke-width': 1.6, opacity: .5 }, svg);
+    S('rect', { x: 70, y: 110, width: 100, height: 46, rx: 23, fill: 'var(--bread)', stroke: 'var(--ink)', 'stroke-width': 1.2 }, svg);
+    const st = sticker(svg, k, 200, 92, 1.4); st.classList.add('pop');
+    say(dup ? `${k.name} 스티커! 이미 있는 거예요.` : `${k.name} 스티커!`);
+    const grid = $('grid'); if (got.length === 1) grid.replaceChildren();
+    const mini = document.createElementNS(NS, 'svg'); mini.setAttribute('viewBox', '-32 -32 64 64'); mini.setAttribute('role', 'img'); mini.setAttribute('aria-label', `${k.name} 스티커`);
+    sticker(mini, k, 0, 0); grid.append(mini);
+    const b = $('next'); b.hidden = false; b.textContent = n < BREADS ? '다음 빵' : '끝'; b.focus();
+  }
+  $('next').addEventListener('click', () => { $('next').hidden = true; if (n < BREADS) bag(); else finish(); });
+  function finish() {
+    const names = [...new Set(got.map(k => k.name))];
+    const line = `빵을 뜯자마자 스티커부터 확인했습니다. ${names.join('·')} 스티커를 모았습니다.`;
+    $('play').hidden = true; $('done').hidden = false;
+    $('done-line').textContent = line; if (window.EMBED) parent.postMessage({ type: 'era-game', line: line }, '*'); $('card-line').textContent = `2006년, 8살. ${line}`;
+    $('again').focus();
+  }
+  function start() {
+    n = 0; got = []; $('grid').replaceChildren(Object.assign(document.createElement('span'), { className: 'empty', textContent: '아직 없어요' }));
+    $('play').hidden = false; $('done').hidden = true; $('next').hidden = true; bag();
+  }
+  $('again').addEventListener('click', start);
+  start();
+})();
+</script>

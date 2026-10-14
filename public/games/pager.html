@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- era-life design/pager.html을 블로그에서 해 보도록 EMBED 모드로 옮긴 것. 끝나면 다시 할 수 있게 다시 단추를 보인다 -->
+<script>window.EMBED = { era: null }</script>
+<style>html.embed body #again { display: revert !important; }</style>
+<title>삐삐 숫자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 한 열(최대 560px). 삐삐 그림(액정에 숫자, 뒤집어 보기) → 뜻 보기 셋 → 세 번 받으면 결과 한 줄과 수첩 카드 → 규칙·출처 메모 */
+:root {
+  --paper: #eceeea; --sheet: #f8f9f6; --ink: #1d2628; --muted: #5b6668; --rule: #d2d7d2;
+  --accent: #2c4c8c; --accent-soft: #e1e7f2; --memo: #9a4f2b; --memo-soft: #f6e8df;
+  --body: #2f3438; --body-2: #454c51; --lcd: #b9c7a4; --lcd-ink: #26301c; --lcd-off: #a7b593;
+  --ok: #2f6b3f; --warn: #b0452a;
+  --f-story: "Gowun Batang", "Nanum Myeongjo", serif;
+  --f-ui: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+    --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+    --body: #0c0f10; --body-2: #262c2f; --lcd: #9fb08a; --lcd-ink: #1b2314; --lcd-off: #8e9f79;
+    --ok: #8fd19e; --warn: #ef8a6c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+  --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+  --body: #0c0f10; --body-2: #262c2f; --lcd: #9fb08a; --lcd-ink: #1b2314; --lcd-off: #8e9f79;
+  --ok: #8fd19e; --warn: #ef8a6c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--paper); }
+body { color: var(--ink); font: 15px/1.6 var(--f-ui); word-break: keep-all; overflow-wrap: break-word; padding-inline: 16px; padding-block: 28px 64px; margin: 0; }
+.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 22px; }
+h1 { font-family: var(--f-story); margin: 0; text-wrap: balance; font-size: clamp(24px, 6vw, 32px); }
+p { margin: 0; }
+.lead { color: var(--muted); font-family: var(--f-story); font-size: 16px; }
+.tag { justify-self: start; font-size: 12px; color: var(--muted); border: 1px dashed var(--muted); border-radius: 4px; padding: 2px 8px; }
+.when { font: 500 13px var(--f-num); color: var(--memo); }
+button { font: inherit; color: inherit; cursor: pointer; border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 11px 14px; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:disabled { cursor: default; }
+.primary { background: var(--accent); color: var(--sheet); border-color: var(--accent); font-weight: 600; }
+.quiet { background: transparent; color: var(--muted); font-size: 13px; padding: 6px 10px; }
+a { color: var(--memo); }
+
+.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 18px; display: grid; gap: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .08); }
+.panel .story { font: 17px/1.7 var(--f-story); }
+
+/* 삐삐 */
+.pager { justify-self: center; width: min(300px, 100%); background: var(--body); border-radius: 18px 18px 22px 22px; padding: 16px 16px 14px; display: grid; gap: 10px; box-shadow: inset 0 -6px 0 var(--body-2), 0 8px 20px rgba(0, 0, 0, .18); }
+.pager .brandless { display: flex; justify-content: space-between; align-items: center; color: #9aa3a8; font: 500 11px var(--f-num); letter-spacing: .1em; }
+.lcd { background: var(--lcd); border-radius: 6px; padding: 10px 12px; min-height: 64px; display: grid; place-items: center; box-shadow: inset 0 2px 6px rgba(0, 0, 0, .25); overflow: hidden; }
+.lcd span { font: 500 clamp(28px, 10vw, 38px)/1 var(--f-num); color: var(--lcd-ink); letter-spacing: .12em; transition: transform .45s cubic-bezier(.2, .8, .2, 1); display: inline-block; }
+.lcd span.flip { transform: rotate(180deg); }
+.lcd span.off { color: var(--lcd-off); }
+.keys { display: flex; justify-content: center; gap: 10px; }
+.keys button { background: var(--body-2); color: #dfe4e6; border: 0; border-radius: 12px; padding: 6px 14px; font-size: 12px; }
+.buzz { animation: buzz .09s linear 6; }
+@keyframes buzz { 50% { transform: translateX(3px) rotate(.6deg); } }
+
+.choices { display: grid; gap: 8px; }
+.choices button { text-align: left; font: 17px var(--f-story); }
+.choices button.right { border-color: var(--ok); box-shadow: 0 0 0 2px var(--ok); }
+.choices button.wrong { border-color: var(--warn); color: var(--muted); }
+.say { font: 15px/1.7 var(--f-story); min-height: 1.7em; }
+.say .src { font: 12px var(--f-ui); color: var(--muted); }
+.got { display: flex; gap: 6px; flex-wrap: wrap; }
+.got span { font: 500 13px var(--f-num); padding: 2px 8px; border-radius: 4px; background: var(--paper); color: var(--muted); }
+
+.card { border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; background: var(--memo-soft); }
+.card .k { font-size: 12px; color: var(--memo); font-weight: 600; letter-spacing: .04em; }
+.card b { font: 700 17px var(--f-story); }
+.card p { font: 15px/1.7 var(--f-story); }
+.card .src { font-size: 12px; }
+.note { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; font-size: 14px; }
+.note ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+@media (prefers-reduced-motion: reduce) { .buzz { animation: none; } .lcd span { transition: none; } }
+
+/* 데모 안(iframe)에서 열리면: 제목·설명·해·다시 단추를 숨기고 판만 보인다 */
+html.embed body { padding-block: 10px 16px; }
+html.embed .tag, html.embed h1, html.embed .lead, html.embed .note, html.embed #again, html.embed .tabs, html.embed .when, html.embed .card { display: none !important; }
+html.embed .wrap { gap: 12px; }
+</style>
+
+<script>if (window.EMBED) document.documentElement.classList.add('embed');</script>
+<main class="wrap">
+  <span class="tag">시안 · 미니게임 · 삐삐 숫자</span>
+  <h1>찍힌 숫자의 뜻은?</h1>
+  <p class="lead">1968년에 태어난 사람의 1997년, 29살 때예요. 무선호출기 가입자가 가장 많던 해예요.</p>
+
+  <section class="panel" id="play">
+    <span class="when">1997 · 29살</span>
+    <p class="story" id="story">허리춤의 삐삐가 울렸습니다.</p>
+    <div class="pager" id="pager">
+      <div class="brandless"><span>PAGER</span><span id="count"></span></div>
+      <div class="lcd"><span id="num" class="off">----</span></div>
+      <div class="keys"><button id="flip" aria-pressed="false">뒤집어 보기</button></div>
+    </div>
+    <div class="choices" id="choices"></div>
+    <p class="say" id="say" aria-live="polite"></p>
+    <div class="got" id="got" aria-label="받은 숫자"></div>
+    <button class="primary" id="next" hidden>다음 삐삐</button>
+  </section>
+
+  <section class="panel" id="done" hidden>
+    <span class="when">1997 · 29살</span>
+    <p class="story" id="done-line"></p>
+    <div class="card">
+      <span class="k">추억 수첩에 넣었습니다 · 물건</span>
+      <b>삐삐(무선호출기)</b>
+      <p id="card-line"></p>
+      <span class="src">출처: <a href="https://v.daum.net/v/20220212060013609" target="_blank" rel="noopener">'삐삐' 무선호출기(下) (아이뉴스24, 2022-02-12)</a> · 숫자 뜻은 아래 메모</span>
+    </div>
+    <button id="again">다시</button>
+  </section>
+
+  <div class="note">
+    <b>미니게임 규칙과 출처</b>
+    <ul>
+      <li>삐삐가 세 번 울려요. 액정에 찍힌 숫자를 보고 뜻을 셋 중에서 골라요. 틀려도 뜻을 알려 주고 넘어가요</li>
+      <li>점수·순위 없음. 맞힌 개수는 보여 주지 않고, 받은 숫자만 수첩에 남아요</li>
+      <li>숫자 뜻 (둘 다 그 시절을 돌아본 뒤의 기사예요. 1990년대 당시 기사는 아직 못 찾았어요)
+        <ul>
+          <li>3207(뒤집어 읽으면 LOVE), 8282(빨리빨리), 1010235(열렬히 사모): <a href="https://www.seoul.co.kr/news/plan/2007/02/21/20070221025001" target="_blank" rel="noopener">서울신문 「추억의 무선호출기 '삐삐'」 (2007-02-21)</a></li>
+          <li>1004(천사), 486(사랑해), 0000(영원히 사랑해), 012(영원히), 1254(이리 오소), 9090(go go, 가자), 8282(빨리빨리): <a href="https://v.daum.net/v/20250821180743842" target="_blank" rel="noopener">파이낸셜뉴스 「[기업과 옛 신문광고] '삐삐'의 추억」 (2025-08-21)</a></li>
+        </ul>
+      </li>
+      <li>"1997년 가입자가 가장 많았다"는 문화 자료의 삐삐 항목(아이뉴스24)</li>
+      <li>시대: 삐삐는 1995~1998년이 한창이라 1990년대생 어린 시절이 아니라 1960년대생 어른 시절에 둬요</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const SEOUL = '서울신문 2007', FN = '파이낸셜뉴스 2025';
+  const CODES = [
+    { n: '3207', mean: 'LOVE', how: '뒤집어 읽으면 LOVE처럼 보여요', src: SEOUL, flip: true },
+    { n: '8282', mean: '빨리빨리', src: `${SEOUL} · ${FN}` },
+    { n: '1010235', mean: '열렬히 사모', src: SEOUL },
+    { n: '1004', mean: '천사', src: FN },
+    { n: '486', mean: '사랑해', src: FN },
+    { n: '0000', mean: '영원히 사랑해', src: FN },
+    { n: '012', mean: '영원히', src: FN },
+    { n: '1254', mean: '이리 오소', src: FN },
+    { n: '9090', mean: 'go go (가자)', src: FN },
+  ];
+  const ROUNDS = 3;
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  let deck, round, cur, got;
+
+  function start() {
+    deck = shuffle(CODES).slice(0, ROUNDS); round = 0; got = [];
+    $('play').hidden = false; $('done').hidden = true; $('got').replaceChildren();
+    ring();
+  }
+  function ring() {
+    cur = deck[round];
+    $('count').textContent = `${round + 1}/${ROUNDS}`;
+    const num = $('num'); num.textContent = cur.n; num.className = ''; $('flip').setAttribute('aria-pressed', 'false');
+    const p = $('pager'); p.classList.remove('buzz'); void p.offsetWidth; p.classList.add('buzz');
+    if (navigator.vibrate) try { navigator.vibrate([80, 60, 80]); } catch (e) {}
+    $('story').textContent = round === 0 ? '허리춤의 삐삐가 울렸습니다.' : '삐삐가 또 울렸습니다.';
+    $('say').replaceChildren(); $('next').hidden = true;
+    const others = shuffle(CODES.filter(c => c !== cur && c.mean !== cur.mean)).slice(0, 2);
+    const box = $('choices'); box.replaceChildren();
+    shuffle([cur, ...others]).forEach(c => {
+      const b = el('button', '', c.mean); b.addEventListener('click', () => answer(b, c)); box.append(b);
+    });
+  }
+  function answer(btn, c) {
+    const right = c === cur;
+    $('choices').querySelectorAll('button').forEach(b => { b.disabled = true; if (b.textContent === cur.mean) b.classList.add('right'); });
+    if (!right) btn.classList.add('wrong');
+    const s = $('say'); s.replaceChildren();
+    s.append(`${cur.n} → "${cur.mean}"${cur.how ? `. ${cur.how}` : ''} `, el('span', 'src', `(${cur.src})`));
+    got.push(cur.n); $('got').append(el('span', '', cur.n));
+    round++;
+    const n = $('next'); n.hidden = false; n.textContent = round < ROUNDS ? '다음 삐삐' : '끝';
+    n.focus();
+  }
+  $('next').addEventListener('click', () => round < ROUNDS ? ring() : finish());
+  $('flip').addEventListener('click', () => {
+    const num = $('num'), on = !num.classList.contains('flip');
+    num.classList.toggle('flip', on); $('flip').setAttribute('aria-pressed', String(on));
+  });
+  function finish() {
+    const line = `삐삐로 숫자 메시지 ${got.join(', ')}이 왔습니다.`;
+    $('play').hidden = true; $('done').hidden = false;
+    $('done-line').textContent = line; if (window.EMBED) parent.postMessage({ type: 'era-game', line: line }, '*'); $('card-line').textContent = `1997년, 29살. ${line}`;
+    $('again').focus();
+  }
+  $('again').addEventListener('click', start);
+  start();
+})();
+</script>

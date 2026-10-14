@@ -60,3 +60,8 @@
 .prose table { display: block; overflow-x: auto; border-collapse: collapse; font-size: var(--text-sm); }
 .prose th, .prose td { overflow-wrap: normal; text-align: left; padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--color-grid); }
 .prose th { color: var(--color-graphite); font-weight: 500; }
+/* 글 안에서 해 보는 미니게임: 펼치기 전에는 게임을 불러오지 않는다 (<details class="play"><summary>…</summary><iframe …></details>) */
+.prose details.play { background: var(--color-sheet); border: 1px solid var(--color-grid); border-radius: var(--radius); }
+.prose details.play + details.play { margin-top: var(--space-xs); }
+.prose details.play summary { cursor: pointer; padding: var(--space-xs) var(--space-sm); font-weight: 600; }
+.prose details.play iframe { display: block; width: 100%; height: 40rem; border: 0; border-top: 1px solid var(--color-grid); }

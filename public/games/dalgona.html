@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- era-life design/dalgona.html을 블로그에서 해 보도록 EMBED 모드로 옮긴 것. 끝나면 다시 할 수 있게 다시 단추를 보인다 -->
+<script>window.EMBED = { era: null }</script>
+<style>html.embed body #again { display: revert !important; }</style>
+<title>달고나 뽑기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 한 열(최대 560px). 1 어떻게 할까(그냥 먹기 / 바늘로 떼기) → 2 손가락으로 모양 따라 긁기 → 3 결과 한 줄과 수첩 카드 → 규칙 메모 */
+:root {
+  --paper: #eceeea; --sheet: #f8f9f6; --ink: #1d2628; --muted: #5b6668; --rule: #d2d7d2;
+  --accent: #2c4c8c; --accent-soft: #e1e7f2; --memo: #9a4f2b; --memo-soft: #f6e8df;
+  --candy: #d39a4a; --candy-edge: #b67a30; --candy-deep: #7a4a18; --candy-hi: #e9be7c; --plate: #b9bdb8;
+  --warn: #b0452a;
+  --f-story: "Gowun Batang", "Nanum Myeongjo", serif;
+  --f-ui: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+    --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+    --candy: #b98236; --candy-edge: #9a6526; --candy-deep: #4e2e0c; --candy-hi: #d3a560; --plate: #3a4144;
+    --warn: #ef8a6c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+  --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+  --candy: #b98236; --candy-edge: #9a6526; --candy-deep: #4e2e0c; --candy-hi: #d3a560; --plate: #3a4144;
+  --warn: #ef8a6c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--paper); }
+body { color: var(--ink); font: 15px/1.6 var(--f-ui); word-break: keep-all; overflow-wrap: break-word; padding-inline: 16px; padding-block: 28px 64px; margin: 0; }
+.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 22px; }
+h1, h2 { font-family: var(--f-story); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(24px, 6vw, 32px); }
+h2 { font-size: 19px; }
+p { margin: 0; }
+.lead { color: var(--muted); font-family: var(--f-story); font-size: 16px; }
+.tag { justify-self: start; font-size: 12px; color: var(--muted); border: 1px dashed var(--muted); border-radius: 4px; padding: 2px 8px; }
+.when { font: 500 13px var(--f-num); color: var(--memo); }
+button { font: inherit; color: inherit; cursor: pointer; border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 11px 14px; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.primary { background: var(--accent); color: var(--sheet); border-color: var(--accent); font-weight: 600; }
+.quiet { background: transparent; color: var(--muted); font-size: 13px; padding: 6px 10px; }
+a { color: var(--memo); }
+
+.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 18px; display: grid; gap: 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, .08); }
+.panel .story { font: 17px/1.7 var(--f-story); }
+.choices { display: grid; gap: 8px; }
+.choices button { text-align: left; display: grid; gap: 2px; }
+.choices b { font: 700 16px var(--f-story); }
+.choices small { color: var(--muted); font-size: 12px; }
+
+/* 판 */
+.board { position: relative; display: grid; gap: 10px; }
+.board svg { display: block; width: 100%; height: auto; max-width: 420px; margin: 0 auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+.hint { text-align: center; color: var(--muted); font-size: 13px; min-height: 1.6em; }
+.hint.warn { color: var(--warn); font-weight: 600; }
+.meters { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; align-items: center; font-size: 12px; color: var(--muted); }
+.bar { height: 6px; border-radius: 3px; background: var(--rule); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--candy-edge); transition: width .08s linear; }
+.bar.stress i { background: var(--accent); }
+.bar.stress.hot i { background: var(--warn); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+
+/* 수첩 카드 */
+.card { border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; background: var(--memo-soft); }
+.card .k { font-size: 12px; color: var(--memo); font-weight: 600; letter-spacing: .04em; }
+.card b { font: 700 17px var(--f-story); }
+.card p { font: 15px/1.7 var(--f-story); }
+.card .src { font-size: 12px; }
+.note { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; font-size: 14px; }
+.note ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+.todo { color: var(--warn); font-weight: 600; }
+
+.pop { animation: pop .5s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes pop { 50% { transform: translateY(-10px) scale(1.04); } to { transform: translateY(-6px); } }
+.shake { animation: shake .3s linear both; }
+@keyframes shake { 25% { transform: translateX(-3px); } 50% { transform: translateX(3px); } 75% { transform: translateX(-2px); } }
+@media (prefers-reduced-motion: reduce) { .pop, .shake { animation: none !important; } }
+
+/* 데모 안(iframe)에서 열리면: 제목·설명·해·다시 단추를 숨기고 판만 보인다 */
+html.embed body { padding-block: 10px 16px; }
+html.embed .tag, html.embed h1, html.embed .lead, html.embed .note, html.embed #again, html.embed .tabs, html.embed .when, html.embed .card { display: none !important; }
+html.embed .wrap { gap: 12px; }
+</style>
+
+<script>if (window.EMBED) document.documentElement.classList.add('embed');</script>
+<main class="wrap">
+  <span class="tag">시안 · 미니게임 · 달고나 뽑기</span>
+  <h1>바늘로 모양 떼어 내기</h1>
+  <p class="lead">1964년에 태어난 아이의 1972년, 8살 때예요. 학교 앞 노점에서 뽑기를 하나 샀어요.</p>
+
+  <section class="panel" id="ask">
+    <span class="when">1972 · 8살 · 학교 앞 노점</span>
+    <p class="story">뽑기 하나를 샀습니다. 가운데에 <b id="shape-name"></b> 모양이 찍혀 있어요.</p>
+    <div class="choices">
+      <button id="go-needle"><b>바늘로 모양을 떼어 낸다</b><small>모양대로 떼어 내면 상품이나 뽑기를 하나 더 받았어요</small></button>
+      <button id="go-eat"><b>그냥 먹는다</b><small>그냥 먹기도 했어요</small></button>
+    </div>
+  </section>
+
+  <section class="panel" id="play" hidden>
+    <div class="row">
+      <span class="when">손가락으로 찍힌 선을 천천히 따라가요</span>
+      <button class="quiet" id="give-up">그만두고 먹기</button>
+    </div>
+    <div class="board" id="board">
+      <svg id="svg" viewBox="0 0 300 300" role="img" aria-label="뽑기 판. 찍힌 모양의 선을 따라 손가락이나 마우스로 긁어요"></svg>
+      <p class="hint" id="hint" aria-live="polite">선 위를 누른 채 천천히 움직여요.</p>
+      <div class="meters">
+        <span>떼어 낸 정도</span><span class="bar" id="bar-prog"><i></i></span>
+        <span>손 힘</span><span class="bar stress" id="bar-stress"><i></i></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="done" hidden>
+    <span class="when">1972 · 8살</span>
+    <p class="story" id="done-line"></p>
+    <div class="card" id="card">
+      <span class="k">추억 수첩에 넣었습니다 · 놀이</span>
+      <b>달고나·뽑기</b>
+      <p id="card-line"></p>
+      <span class="src">출처: <a href="https://folkency.nfm.go.kr/topic/detail/11902" target="_blank" rel="noopener">달고나–국립민속박물관 한국민속대백과사전</a></span>
+    </div>
+    <button id="again">다른 모양으로 다시</button>
+  </section>
+
+  <div class="note">
+    <b>미니게임 규칙</b>
+    <ul>
+      <li>사실만: 뽑기는 녹인 설탕을 납작하게 눌러 틀로 모양을 새긴 것. 그냥 먹거나 바늘로 모양만 떼어 냈고, 모양대로 떼면 상품이나 뽑기를 하나 더 받았다 (한국민속대백과사전 「달고나」)</li>
+      <li>점수·순위 없음. 결과는 수첩에 한 줄로만 남아요. 숫자는 보여 주지 않아요</li>
+      <li>안 해도 돼요. "그냥 먹는다"를 고르거나 중간에 그만둬도 일생은 그대로 이어져요</li>
+      <li>빨리 긁거나 선에서 벗어나 긁으면 손 힘이 차오르고, 다 차면 금이 가요</li>
+      <li class="todo">TODO: 출처에 모양 이름이 없어서 동그라미·세모·별은 시안용 임시 모양. 그 시절 모양을 적은 자료를 찾으면 바꿔요</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const S = (tag, a, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const C = 150, N = 240, TOL = 9;
+
+  // 모양: 닫힌 다각형 꼭짓점 (원은 많은 점)
+  const SHAPES = {
+    '동그라미': () => Array.from({ length: 64 }, (_, i) => { const a = i / 64 * Math.PI * 2; return [C + 60 * Math.cos(a), C + 60 * Math.sin(a)]; }),
+    '세모': () => [0, 1, 2].map(i => { const a = -Math.PI / 2 + i * Math.PI * 2 / 3; return [C + 78 * Math.cos(a), C + 10 + 78 * Math.sin(a)]; }),
+    '별': () => Array.from({ length: 10 }, (_, i) => { const r = i % 2 ? 32 : 78, a = -Math.PI / 2 + i * Math.PI / 5; return [C + r * Math.cos(a), C + 4 + r * Math.sin(a)]; }),
+  };
+  // 둘레를 고르게 N개로
+  function sample(poly) {
+    const seg = poly.map((p, i) => { const q = poly[(i + 1) % poly.length]; return [p, q, Math.hypot(q[0] - p[0], q[1] - p[1])]; });
+    const total = seg.reduce((s, x) => s + x[2], 0), out = [];
+    let si = 0, acc = 0;
+    for (let k = 0; k < N; k++) {
+      const t = k / N * total;
+      while (acc + seg[si][2] < t) { acc += seg[si][2]; si++; }
+      const [p, q, len] = seg[si], u = (t - acc) / len;
+      out.push([p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u]);
+    }
+    return out;
+  }
+  const pathOf = poly => 'M' + poly.map(p => p.map(v => v.toFixed(1)).join(' ')).join(' L') + ' Z';
+
+  // 둥글고 살짝 울퉁불퉁한 판 (고정 값이라 매번 같음)
+  const RIM = Array.from({ length: 36 }, (_, i) => { const a = i / 36 * Math.PI * 2, r = 124 + 3 * Math.sin(i * 2.7) + 2 * Math.cos(i * 5.3); return [C + r * Math.cos(a), C + r * Math.sin(a)]; });
+  const BUBBLES = Array.from({ length: 46 }, (_, i) => { const a = i * 2.39996, r = 112 * Math.sqrt((i + .5) / 46); return [C + r * Math.cos(a), C + r * Math.sin(a), 1.4 + (i * 7 % 5) * .5]; });
+
+  const names = Object.keys(SHAPES);
+  let shapeName = names[Math.floor(Math.random() * names.length)];
+  let pts, cov, stress, state, last, raf, cracks, warned;
+  const svg = $('svg');
+
+  function draw() {
+    svg.replaceChildren();
+    S('ellipse', { cx: C, cy: 160, rx: 138, ry: 132, fill: 'var(--plate)', opacity: .5 }, svg);
+    const disc = S('g', { id: 'disc' }, svg);
+    S('path', { d: pathOf(RIM), fill: 'var(--candy)', stroke: 'var(--candy-edge)', 'stroke-width': 3 }, disc);
+    BUBBLES.forEach(([x, y, r]) => S('circle', { cx: x, cy: y, r, fill: 'var(--candy-hi)', opacity: .45 }, disc));
+    const poly = SHAPES[shapeName]();
+    pts = sample(poly);
+    // 찍힌 자국: 밝은 테두리 위에 진한 홈
+    S('path', { d: pathOf(poly), fill: 'none', stroke: 'var(--candy-hi)', 'stroke-width': 5, 'stroke-linejoin': 'round', transform: 'translate(0.8 0.8)' }, disc);
+    S('path', { id: 'groove', d: pathOf(poly), fill: 'none', stroke: 'var(--candy-edge)', 'stroke-width': 3, 'stroke-linejoin': 'round' }, disc);
+    S('path', { id: 'shape-fill', d: pathOf(poly), fill: 'var(--candy)', opacity: 0 }, svg);
+    S('path', { id: 'scratch', d: '', fill: 'none', stroke: 'var(--candy-deep)', 'stroke-width': 3.6, 'stroke-linecap': 'round' }, svg);
+    S('g', { id: 'cracks' }, svg);
+    const nd = S('g', { id: 'needle', opacity: 0 }, svg);
+    S('line', { x1: 0, y1: 0, x2: 34, y2: -46, stroke: 'var(--ink)', 'stroke-width': 1.6, 'stroke-linecap': 'round' }, nd);
+    S('ellipse', { cx: 31, cy: -42, rx: 1.6, ry: 3.2, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 1, transform: 'rotate(36 31 -42)' }, nd);
+  }
+
+  function reset() {
+    cov = new Array(N).fill(false); stress = 0; state = 'idle'; last = null; cracks = 0; warned = false;
+    $('shape-name').textContent = shapeName;
+    draw(); meters();
+    $('hint').textContent = '선 위를 누른 채 천천히 움직여요.'; $('hint').classList.remove('warn');
+  }
+
+  const toSvg = e => { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const q = p.matrixTransform(svg.getScreenCTM().inverse()); return [q.x, q.y]; };
+  const nearest = (x, y) => { let best = Infinity; for (const [px, py] of pts) { const d = Math.hypot(px - x, py - y); if (d < best) best = d; } return best; };
+  function mark(x, y) { for (let i = 0; i < N; i++) if (!cov[i] && Math.hypot(pts[i][0] - x, pts[i][1] - y) <= TOL) cov[i] = true; }
+  const progress = () => cov.filter(Boolean).length / N;
+
+  function meters() {
+    $('bar-prog').firstElementChild.style.width = (progress() * 100).toFixed(1) + '%';
+    const sb = $('bar-stress'); sb.firstElementChild.style.width = Math.min(100, stress * 100).toFixed(1) + '%';
+    sb.classList.toggle('hot', stress > .6);
+    let d = '';
+    for (let i = 0; i < N; i++) if (cov[i] && cov[(i + 1) % N]) { const a = pts[i], b = pts[(i + 1) % N]; d += `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0].toFixed(1)} ${b[1].toFixed(1)}`; }
+    const sc = document.getElementById('scratch'); if (sc) sc.setAttribute('d', d);
+  }
+
+  // 작은 금(경고)과 큰 금(깨짐)
+  function crack(x, y, big) {
+    const g = document.getElementById('cracks');
+    let a = Math.atan2(y - C, x - C) + (Math.random() - .5) * .8, len = big ? 140 : 10 + Math.random() * 8, d = `M${x.toFixed(1)} ${y.toFixed(1)}`, cx = x, cy = y;
+    for (let s = 0, n = big ? 9 : 3; s < n; s++) { a += (Math.random() - .5) * .9; cx += Math.cos(a) * len / n; cy += Math.sin(a) * len / n; d += ` L${cx.toFixed(1)} ${cy.toFixed(1)}`; }
+    S('path', { d, fill: 'none', stroke: 'var(--candy-deep)', 'stroke-width': big ? 2.4 : 1.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+    if (navigator.vibrate) try { navigator.vibrate(big ? 60 : 12); } catch (e) {}
+  }
+
+  function tick(now) {
+    if (state !== 'drag' && state !== 'idle') return;
+    if (tick.t != null) stress = Math.max(0, stress - (now - tick.t) * 0.00035);
+    tick.t = now; meters();
+    if (stress < .45 && warned) { warned = false; $('hint').textContent = '좋아요, 천천히.'; $('hint').classList.remove('warn'); }
+    raf = requestAnimationFrame(tick);
+  }
+
+  function down(e) {
+    if (state !== 'idle' && state !== 'drag') return;
+    e.preventDefault(); svg.setPointerCapture(e.pointerId);
+    const [x, y] = toSvg(e); last = { x, y, t: e.timeStamp }; state = 'drag';
+    const nd = document.getElementById('needle'); nd.setAttribute('opacity', 1); nd.setAttribute('transform', `translate(${x} ${y})`);
+    mark(x, y);
+  }
+  function move(e) {
+    if (state !== 'drag') return;
+    e.preventDefault();
+    const [x, y] = toSvg(e), dt = Math.max(1, e.timeStamp - last.t), m = Math.hypot(x - last.x, y - last.y);
+    document.getElementById('needle').setAttribute('transform', `translate(${x} ${y})`);
+    if (m < .3) return;
+    // 이동 구간을 잘게 나눠 표시
+    const steps = Math.ceil(m / 3);
+    for (let s = 1; s <= steps; s++) mark(last.x + (x - last.x) * s / steps, last.y + (y - last.y) * s / steps);
+    const off = nearest(x, y), speed = m / dt;
+    let add = 0;
+    if (off > TOL) add += m * 0.012 * Math.min(1, (off - TOL) / 20);
+    if (speed > 0.3) add += m * 0.02 * Math.min(2, speed - 0.3);
+    stress += add;
+    if (stress > .45 && cracks === 0) { crack(x, y, false); cracks++; }
+    if (stress > .75 && cracks === 1) { crack(x, y, false); cracks++; }
+    if (stress > .45 && !warned) { warned = true; $('hint').textContent = speed > 0.3 ? '바삭, 너무 빨라요!' : '바삭, 선에서 벗어났어요!'; $('hint').classList.add('warn'); }
+    last = { x, y, t: e.timeStamp };
+    if (stress >= 1) return broke(x, y);
+    if (progress() >= .97) return freed();
+  }
+  function up() { if (state === 'drag') { state = 'idle'; document.getElementById('needle').setAttribute('opacity', 0); } }
+
+  function broke(x, y) {
+    state = 'over'; cancelAnimationFrame(raf); crack(x, y, true); meters();
+    $('board').classList.add('shake');
+    $('hint').textContent = '쩍, 모양에 금이 갔어요.'; $('hint').classList.add('warn');
+    setTimeout(() => finish(`${shapeName} 모양을 떼다가 금이 갔습니다.`), 900);
+  }
+  function freed() {
+    state = 'over'; cancelAnimationFrame(raf); cov.fill(true); meters();
+    document.getElementById('needle').setAttribute('opacity', 0);
+    const f = document.getElementById('shape-fill'); f.setAttribute('opacity', 1); f.setAttribute('stroke', 'var(--candy-deep)'); f.setAttribute('stroke-width', 2);
+    f.classList.add('pop'); f.style.transformOrigin = 'center'; f.style.transformBox = 'fill-box';
+    document.getElementById('disc').setAttribute('opacity', .55);
+    $('hint').textContent = '똑, 모양이 떨어졌어요!'; $('hint').classList.remove('warn');
+    setTimeout(() => finish(`바늘로 ${shapeName} 모양을 떼어 내서 뽑기를 하나 더 받았습니다.`), 1000);
+  }
+  function finish(line) {
+    $('play').hidden = true; $('done').hidden = false;
+    $('done-line').textContent = line; if (window.EMBED) parent.postMessage({ type: 'era-game', line: line }, '*'); $('card-line').textContent = `1972년, 8살. ${line}`;
+    $('again').focus();
+  }
+
+  svg.addEventListener('pointerdown', down);
+  svg.addEventListener('pointermove', move);
+  svg.addEventListener('pointerup', up);
+  svg.addEventListener('pointercancel', up);
+
+  $('go-needle').addEventListener('click', () => { $('ask').hidden = true; $('play').hidden = false; reset(); tick.t = null; raf = requestAnimationFrame(tick); $('play').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+  $('go-eat').addEventListener('click', () => { $('ask').hidden = true; finish('학교 앞 노점에서 산 뽑기를 그냥 먹었습니다.'); });
+  $('give-up').addEventListener('click', () => { state = 'over'; cancelAnimationFrame(raf); finish(`${shapeName} 모양을 떼다가 그만두고 먹었습니다.`); });
+  $('again').addEventListener('click', () => {
+    shapeName = names[(names.indexOf(shapeName) + 1) % names.length];
+    $('board').classList.remove('shake'); $('done').hidden = true; $('ask').hidden = false; reset(); $('go-needle').focus();
+  });
+  reset();
+})();
+</script>

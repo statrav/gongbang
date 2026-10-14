@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- era-life design/spintop.html을 블로그에서 해 보도록 EMBED 모드로 옮긴 것. 끝나면 다시 할 수 있게 다시 단추를 보인다 -->
+<script>window.EMBED = { era: null }</script>
+<style>html.embed body #again { display: revert !important; }</style>
+<title>팽이 대결</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 한 열(최대 560px). 판(팽이에 끼운 톱니 막대를 옆으로 쭉 끌어 빼기) → 두 팽이가 도는 그릇 → 결과 한 줄과 수첩 카드 → 규칙 메모 */
+:root {
+  --paper: #eceeea; --sheet: #f8f9f6; --ink: #1d2628; --muted: #5b6668; --rule: #d2d7d2;
+  --accent: #2c4c8c; --accent-soft: #e1e7f2; --memo: #9a4f2b; --memo-soft: #f6e8df;
+  --bowl: #d7dbd4; --bowl-2: #bfc5bd; --mine: #2c4c8c; --mine-2: #93aee6; --friend: #9a4f2b; --friend-2: #e3a27f; --bar: #7d8a96; --warn: #b0452a;
+  --f-story: "Gowun Batang", "Nanum Myeongjo", serif;
+  --f-ui: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+    --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+    --bowl: #2a3134; --bowl-2: #3a4246; --mine: #93aee6; --mine-2: #2c4c8c; --friend: #e3a27f; --friend-2: #9a4f2b; --bar: #9aa5ae; --warn: #ef8a6c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121718; --sheet: #1a2022; --ink: #e4e8e3; --muted: #9aa5a5; --rule: #2f383a;
+  --accent: #93aee6; --accent-soft: #212e49; --memo: #e3a27f; --memo-soft: #33241c;
+  --bowl: #2a3134; --bowl-2: #3a4246; --mine: #93aee6; --mine-2: #2c4c8c; --friend: #e3a27f; --friend-2: #9a4f2b; --bar: #9aa5ae; --warn: #ef8a6c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--paper); }
+body { color: var(--ink); font: 15px/1.6 var(--f-ui); word-break: keep-all; overflow-wrap: break-word; padding-inline: 16px; padding-block: 28px 64px; margin: 0; }
+.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 22px; }
+h1 { font-family: var(--f-story); margin: 0; text-wrap: balance; font-size: clamp(24px, 6vw, 32px); }
+p { margin: 0; }
+.lead { color: var(--muted); font-family: var(--f-story); font-size: 16px; }
+.tag { justify-self: start; font-size: 12px; color: var(--muted); border: 1px dashed var(--muted); border-radius: 4px; padding: 2px 8px; }
+.when { font: 500 13px var(--f-num); color: var(--memo); }
+button { font: inherit; color: inherit; cursor: pointer; border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 11px 14px; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a { color: var(--memo); }
+.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 18px; display: grid; gap: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .08); }
+.panel .story { font: 17px/1.7 var(--f-story); }
+svg { display: block; width: 100%; height: auto; max-width: 420px; margin: 0 auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+.say { text-align: center; font: 16px/1.6 var(--f-story); min-height: 1.6em; }
+.say.warn { color: var(--warn); }
+.card { border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; background: var(--memo-soft); }
+.card .k { font-size: 12px; color: var(--memo); font-weight: 600; letter-spacing: .04em; }
+.card b { font: 700 17px var(--f-story); }
+.card p { font: 15px/1.7 var(--f-story); }
+.card .src { font-size: 12px; }
+.note { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 6px; font-size: 14px; }
+.note ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+
+/* 데모 안(iframe)에서 열리면: 제목·설명·해·다시 단추를 숨기고 판만 보인다 */
+html.embed body { padding-block: 10px 16px; }
+html.embed .tag, html.embed h1, html.embed .lead, html.embed .note, html.embed #again, html.embed .tabs, html.embed .when, html.embed .card { display: none !important; }
+html.embed .wrap { gap: 12px; }
+</style>
+
+<script>if (window.EMBED) document.documentElement.classList.add('embed');</script>
+<main class="wrap">
+  <span class="tag">시안 · 미니게임 · 팽이</span>
+  <h1>막대를 쭉, 빠르게</h1>
+  <p class="lead">1994년에 태어난 아이의 2002년 봄, 8살 때예요. 팽이 만화가 막 끝나고 팽이가 한창 인기였어요.</p>
+
+  <section class="panel" id="play">
+    <span class="when">2002 · 8살</span>
+    <p class="story" id="story">친구와 팽이를 겨루기로 했습니다.</p>
+    <svg id="svg" viewBox="0 0 300 220" role="img" aria-label="팽이와 톱니 막대"></svg>
+    <p class="say" id="say" aria-live="polite"></p>
+  </section>
+
+  <section class="panel" id="done" hidden>
+    <span class="when">2002 · 8살</span>
+    <p class="story" id="done-line"></p>
+    <div class="card">
+      <span class="k">추억 수첩에 넣었습니다 · 놀이</span>
+      <b>팽이 대결</b>
+      <p id="card-line"></p>
+      <span class="src">출처: <a href="https://www.hankookilbo.com/news/article/200204130086493338" target="_blank" rel="noopener">캐릭터 이야기 / 탑 블레이드 (한국일보, 2002-04-13)</a></span>
+    </div>
+    <button id="again">다시</button>
+  </section>
+
+  <div class="note">
+    <b>미니게임 규칙</b>
+    <ul>
+      <li>사실만: 톱니가 달린 막대를 팽이에 끼워 빠르게 빼내면 그 힘으로 돈다. 애니메이션이 2001년 10월부터 2002년 4월까지 방영됐고 팽이 하나가 만 원 가까이 했다 (한국일보 2002-04-13)</li>
+      <li>조작: 톱니 막대 손잡이를 잡고 오른쪽 끝까지 쭉 끌어요. 빨리 뺄수록 오래 돌아요</li>
+      <li>게임 규칙(출처 없음): 먼저 멈추는 팽이가 져요. 친구 팽이가 도는 시간은 무작위</li>
+      <li>상표·캐릭터 그림은 쓰지 않고 일반 팽이로 그렸어요. 점수·순위 없음, 이겼는지만 수첩에</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const S = (tag, a, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const svg = $('svg');
+  const say = (t, warn) => { $('say').textContent = t; $('say').classList.toggle('warn', !!warn); };
+  let state, drag, raf;
+
+  function top(g, c1, c2) {
+    S('path', { d: 'M-26 -4 L26 -4 L8 16 L0 24 L-8 16 Z', fill: c2, stroke: 'var(--ink)', 'stroke-width': 1.4, 'stroke-linejoin': 'round' }, g);
+    S('ellipse', { cx: 0, cy: -6, rx: 28, ry: 10, fill: c1, stroke: 'var(--ink)', 'stroke-width': 1.4 }, g);
+    const spin = S('g', { class: 'face' }, g);
+    for (let i = 0; i < 3; i++) S('path', { d: 'M0 -6 L20 -9', stroke: c2, 'stroke-width': 3, 'stroke-linecap': 'round', transform: `rotate(${i * 120} 0 -6) scale(1 .36) translate(0 ${-6 / .36 + 6})` }, spin);
+    S('circle', { cx: 0, cy: -6, r: 4, fill: 'var(--sheet)', stroke: 'var(--ink)', 'stroke-width': 1 }, g);
+    return spin;
+  }
+  function setup() {
+    svg.replaceChildren(); state = 'ready';
+    S('rect', { x: 0, y: 0, width: 300, height: 220, rx: 12, fill: 'var(--paper)' }, svg);
+    const t = S('g', { transform: 'translate(90 130)' }, svg); top(t, 'var(--mine)', 'var(--mine-2)');
+    // 톱니 막대: 팽이 머리를 가로질러 끼워져 있음
+    const bar = S('g', { id: 'bar', transform: 'translate(0 0)' }, svg);
+    S('rect', { x: 60, y: 117, width: 150, height: 8, rx: 2, fill: 'var(--bar)', stroke: 'var(--ink)', 'stroke-width': 1.2 }, bar);
+    for (let x = 64; x < 206; x += 7) S('path', { d: `M${x} 125 l3 5 l3 -5`, fill: 'var(--bar)', stroke: 'var(--ink)', 'stroke-width': .8 }, bar);
+    S('rect', { id: 'grip', x: 206, y: 106, width: 34, height: 30, rx: 8, fill: 'var(--accent)', stroke: 'var(--ink)', 'stroke-width': 1.2 }, bar);
+    S('path', { d: 'M248 121 l26 0 m-8 -7 l8 7 l-8 7', stroke: 'var(--muted)', 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' }, svg);
+    say('파란 손잡이를 잡고 오른쪽으로 쭉, 빠르게!');
+  }
+  const toSvg = e => { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const q = p.matrixTransform(svg.getScreenCTM().inverse()); return [q.x, q.y]; };
+  svg.addEventListener('pointerdown', e => {
+    if (state !== 'ready') return;
+    const [x, y] = toSvg(e); if (x < 190 || y < 95 || y > 150) return;
+    e.preventDefault(); svg.setPointerCapture(e.pointerId);
+    state = 'pull'; drag = { x0: x, pts: [[x, e.timeStamp]] };
+  });
+  svg.addEventListener('pointermove', e => {
+    if (state !== 'pull') return;
+    const [x] = toSvg(e), dx = Math.max(0, x - drag.x0);
+    $('bar').setAttribute('transform', `translate(${dx} 0)`);
+    drag.pts.push([x, e.timeStamp]); if (drag.pts.length > 6) drag.pts.shift();
+    if (dx > 120) launch();
+  });
+  const cancel = () => { if (state === 'pull') { state = 'ready'; $('bar').setAttribute('transform', 'translate(0 0)'); say('끝까지 쭉 빼야 돌아요.', true); } };
+  svg.addEventListener('pointerup', cancel); svg.addEventListener('pointercancel', cancel);
+
+  function launch() {
+    state = 'spin';
+    const a = drag.pts[0], b = drag.pts[drag.pts.length - 1], v = (b[0] - a[0]) / Math.max(1, b[1] - a[1]); // 단위/ms
+    const mine = 2500 + Math.min(1, v / 1.2) * 4500;   // 2.5~7초 (빨리 빼도 가끔 짐)
+    const friend = 3500 + Math.random() * 4000;        // 3.5~7.5초
+    say(v > .8 ? '쌩—! 힘차게 돈다' : v > .35 ? '돌아간다!' : '살살 돈다…');
+    arena(mine, friend);
+  }
+  function arena(mine, friend) {
+    svg.replaceChildren();
+    S('rect', { x: 0, y: 0, width: 300, height: 220, rx: 12, fill: 'var(--paper)' }, svg);
+    S('ellipse', { cx: 150, cy: 118, rx: 130, ry: 72, fill: 'var(--bowl)', stroke: 'var(--ink)', 'stroke-width': 1.4 }, svg);
+    S('ellipse', { cx: 150, cy: 122, rx: 96, ry: 48, fill: 'var(--bowl-2)' }, svg);
+    const tops = [['mine', 'var(--mine)', 'var(--mine-2)', mine, 0], ['friend', 'var(--friend)', 'var(--friend-2)', friend, Math.PI]].map(([id, c1, c2, life, ph]) => {
+      const g = S('g', {}, svg), face = top(g, c1, c2);
+      S('text', { x: 0, y: 46, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--muted)', 'font-family': 'var(--f-ui)' }, g).textContent = id === 'mine' ? '내 팽이' : '친구 팽이';
+      return { id, g, face, life, ph, ang: 0, stopped: false };
+    });
+    const t0 = performance.now(); let last = t0, first = null;
+    (function f(now) {
+      const dt = now - last; last = now;
+      tops.forEach(t => {
+        const left = Math.max(0, 1 - (now - t0) / t.life), wob = (1 - left) * 9;
+        if (!t.stopped && left === 0) { t.stopped = true; if (!first) first = t.id; }
+        t.ang += dt * .9 * left;
+        const orbit = (now - t0) / 1600 + t.ph, r = 40 + 12 * Math.sin(orbit * 1.7);
+        const x = t.stopped ? t.x : 150 + Math.cos(orbit) * r * 1.4, y = t.stopped ? t.y : 118 + Math.sin(orbit) * r * .55;
+        t.x = x; t.y = y;
+        t.g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${t.stopped ? (t.id === 'mine' ? 24 : -24) : Math.sin(now / 90) * wob})`);
+        t.face.setAttribute('transform', `rotate(${(t.ang * 57) % 360} 0 -6)`);
+      });
+      if (first && tops.every(t => t.stopped) || first && now - t0 > Math.min(mine, friend) + 600) {
+        const win = first === 'friend';
+        say(win ? '친구 팽이가 먼저 멈췄어요!' : '내 팽이가 먼저 멈췄어요.', !win);
+        return setTimeout(() => finish(win), 900);
+      }
+      raf = requestAnimationFrame(f);
+    })(t0);
+  }
+  function finish(win) {
+    const line = win ? '톱니 막대를 쭉 빼서 돌린 팽이가 친구 팽이보다 오래 돌았습니다.' : '톱니 막대를 빼서 팽이를 돌렸는데, 친구 팽이가 더 오래 돌았습니다.';
+    $('play').hidden = true; $('done').hidden = false;
+    $('done-line').textContent = line; if (window.EMBED) parent.postMessage({ type: 'era-game', line: line }, '*'); $('card-line').textContent = `2002년, 8살. ${line}`;
+    $('again').focus();
+  }
+  $('again').addEventListener('click', () => { $('play').hidden = false; $('done').hidden = true; setup(); });
+  setup();
+})();
+</script>

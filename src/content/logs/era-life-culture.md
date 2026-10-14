@@ -50,6 +50,19 @@ summary: 집값 대신 달고나와 공기놀이를 넣고, 시대를 셋으로 
 
 공기놀이는 손을 꽤 봤어요. 처음에는 한 번 누르면 돌이 두 개씩 들어와서 덜 재밌었어요. 그래서 두 알, 세 알도 떠 있는 동안 한 알씩 "따닥" 눌러야 줍게 바꿨어요. 돌이 떠 있는 시간도 모두 1.5초이던 것을 한 알씩 1.3초, 두 알씩 1.4초, 세 알씩 1.5초, 네 알 쓸기 1.6초로 나눴어요.
 
+![미니게임 여덟 개: 공기놀이, 엿치기, 달고나 뽑기, 딱지치기, 삐삐, 미니카, 팽이, 빵 스티커](../../assets/projects/era-life/games.png)
+
+여기서 바로 해 볼 수도 있어요. 눌러서 펼치면 게임이 열려요.
+
+<details class="play"><summary>공기놀이 · 1930년대 해 보기</summary><iframe src="../../games/gonggi.html" title="공기놀이 미니게임" loading="lazy"></iframe></details>
+<details class="play"><summary>엿치기 · 1930년대 해 보기</summary><iframe src="../../games/yeot.html" title="엿치기 미니게임" loading="lazy"></iframe></details>
+<details class="play"><summary>달고나 뽑기 · 1960년대 해 보기</summary><iframe src="../../games/dalgona.html" title="달고나 뽑기 미니게임" loading="lazy"></iframe></details>
+<details class="play"><summary>딱지치기 · 1960년대 해 보기</summary><iframe src="../../games/ddakji.html" title="딱지치기 미니게임" loading="lazy"></iframe></details>
+<details class="play"><summary>삐삐 · 1990년대 해 보기</summary><iframe src="../../games/pager.html" title="삐삐 미니게임" loading="lazy"></iframe></details>
+<details class="play"><summary>미니카 · 1990년대 해 보기</summary><iframe src="../../games/minicar.html" title="미니카 미니게임" loading="lazy"></iframe></details>
+<details class="play"><summary>팽이 · 1990년대 해 보기</summary><iframe src="../../games/spintop.html" title="팽이 미니게임" loading="lazy"></iframe></details>
+<details class="play"><summary>빵 스티커 · 1990년대 해 보기</summary><iframe src="../../games/sticker.html" title="빵 스티커 미니게임" loading="lazy"></iframe></details>
+
 ## 끝나면, 같은 나이 다른 시대
 
 일생이 끝나면 추억 수첩에 겪은 문화가 카드로 모여 있어요. 그다음 같은 자리의 세 해에 태어난 사람이 같은 나이에 어땠는지를 나란히 놓아요. 요즘은 결혼이 필수인 시대도 아니라서, 결혼 말고도 살아 있던 사람, 도시에서 자란 사람, 대학에 간 사람, 8살 때 놀던 것을 함께 보여 줘요.
