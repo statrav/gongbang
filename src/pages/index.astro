@@ -6,7 +6,8 @@ import { getProjects, getLogs } from '../lib/content';
 import { url } from '../lib/url';
 
 const projects = await getProjects();
-const onBench = projects.filter((p) => p.data.status === 'active');
+// 홈에는 최근에 시작한 순서로 4개만 (작업 중·완성 섞어서). 전체는 프로젝트 목록에
+const recent = [...projects].sort((a, b) => b.data.startedAt.getTime() - a.data.startedAt.getTime()).slice(0, 4);
 const logs = (await getLogs()).slice(0, 8);
 const projectTitles = Object.fromEntries(projects.map((p) => [p.id, p.data.title]));
 ---
@@ -19,17 +20,22 @@ const projectTitles = Object.fromEntries(projects.map((p) => [p.id, p.data.title
       <p><span>퇴근하고 만드는 작은 도구들과,</span> <span>만들면서 알게 된 것들을 적어 둡니다.</span></p>
     </section>
 
-    {onBench.length > 0 && (
-      <section class="bench" aria-labelledby="bench-title">
-        <h2 id="bench-title" class="visually-hidden">지금 만드는 것</h2>
-        {onBench.map((p) => <ProjectCard project={p} label="지금 작업대 위" />)}
+    {recent.length > 0 && (
+      <section class="projects" aria-labelledby="projects-title">
+        <div class="section-head">
+          <h2 id="projects-title">프로젝트</h2>
+          <a href={url('/projects/')}>더보기 ›</a>
+        </div>
+        <div class="project-grid">
+          {recent.map((p) => <ProjectCard project={p} compact />)}
+        </div>
       </section>
     )}
 
     <section class="logs" aria-labelledby="logs-title">
-      <div class="logs-head">
+      <div class="section-head">
         <h2 id="logs-title">제작기</h2>
-        {logs.length > 0 && <a href={url('/logs/')}>전체 보기</a>}
+        {logs.length > 0 && <a href={url('/logs/')}>더보기 ›</a>}
       </div>
       <LogList logs={logs} projectTitles={projectTitles} />
     </section>
@@ -46,9 +52,9 @@ const projectTitles = Object.fromEntries(projects.map((p) => [p.id, p.data.title
   }
   .hero p { margin: var(--space-md) 0 0; color: var(--color-graphite); font-size: var(--text-lg); line-height: 1.6; }
   .hero p span { display: inline-block; text-wrap: balance; }
-  .bench { display: grid; gap: var(--space-md); max-width: 36rem; }
-  .logs { max-width: 42rem; }
-  .logs-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-md); margin-bottom: var(--space-sm); }
-  .logs-head h2 { font-size: var(--text-xl); }
-  .logs-head a { font-size: var(--text-sm); white-space: nowrap; }
+  .projects, .logs { max-width: 42rem; }
+  .project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); }
+  .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-md); margin-bottom: var(--space-sm); }
+  .section-head h2 { font-size: var(--text-xl); }
+  .section-head a { font-size: var(--text-sm); white-space: nowrap; }
 </style>
