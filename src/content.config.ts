@@ -12,6 +12,8 @@ const projects = defineCollection({
     summary: z.string(),
     status: z.enum(['active', 'paused', 'done']),
     startedAt: z.coerce.date(),
+    // true면 시작일과 상관없이 목록 맨 위에 고정된다
+    pinned: z.boolean().default(false),
     draft: z.boolean().default(false),
   }),
 });

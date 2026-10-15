@@ -11,10 +11,15 @@ interface Props {
 }
 
 const { project, label, compact = false } = Astro.props;
-const { title, note, summary, status } = project.data;
+const { title, note, summary, status, pinned } = project.data;
 ---
 
-<article class:list={['card', { compact }]}>
+<article class:list={['card', { compact, pinned }]}>
+  {pinned && (
+    <span class="pin" role="img" aria-label="고정됨">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17v5" /><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z" /></svg>
+    </span>
+  )}
   <p class:list={['label', { muted: status !== 'active' }]}>{label ?? STATUS_LABEL[status]}</p>
   <h3>
     <a href={url(`/projects/${project.id}/`)}>{title}</a>
@@ -51,10 +56,16 @@ const { title, note, summary, status } = project.data;
     white-space: nowrap;
   }
   .summary { margin: 0; color: var(--color-graphite); }
+  /* 고정한 카드: 오른쪽 위 모서리에 연필색 압정 */
+  .pin { position: absolute; top: var(--space-md); right: var(--space-md); line-height: 0; color: var(--color-graphite); }
+  .pin svg { width: var(--text-base); height: var(--text-base); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .pinned .label { padding-right: var(--space-lg); }
 
   .compact { padding: var(--space-sm) var(--space-sm) var(--space-md); min-width: 0; }
   .compact h3 { font-size: var(--text-lg); line-height: 1.3; }
   .compact small { white-space: normal; }
+  .compact .pin { top: var(--space-sm); right: var(--space-sm); }
+  .compact .pin svg { width: var(--text-sm); height: var(--text-sm); }
   .compact .summary {
     font-size: var(--text-sm);
     display: -webkit-box;
