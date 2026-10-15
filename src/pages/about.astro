@@ -1,7 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import { SITE } from '../lib/site';
 import { url } from '../lib/url';
+import openchatQr from '../assets/openchat-qr.jpeg';
 import '../styles/prose.css';
 ---
 
@@ -17,6 +19,10 @@ import '../styles/prose.css';
       </ul>
       <p>화면 캡처의 금액과 이름은 모두 가상 데이터예요.</p>
       <h2>연락</h2>
+      <p>문의는 카카오 오픈채팅 <a href={SITE.openchat}>{SITE.name}</a>으로 주세요. 휴대폰 카메라로 아래 QR을 찍어도 들어올 수 있어요.</p>
+      <a class="qr" href={SITE.openchat}>
+        <Image src={openchatQr} alt={`카카오 오픈채팅 ${SITE.name} QR 코드`} width={320} />
+      </a>
       <p>코드와 이슈는 <a href={SITE.github}>GitHub</a>에 있어요.</p>
     </div>
   </div>
@@ -25,4 +31,6 @@ import '../styles/prose.css';
 <style>
   .page { padding-top: var(--space-xl); display: grid; gap: var(--space-lg); }
   h1 { font-size: var(--text-2xl); }
+  .qr { display: block; width: 10rem; max-width: 100%; }
+  .qr :global(img) { display: block; width: 100%; height: auto; }
 </style>
