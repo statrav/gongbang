@@ -12,7 +12,6 @@ const projects = defineCollection({
     summary: z.string(),
     status: z.enum(['active', 'paused', 'done']),
     startedAt: z.coerce.date(),
-    order: z.number().default(0),
     draft: z.boolean().default(false),
   }),
 });

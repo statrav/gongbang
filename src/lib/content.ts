@@ -4,7 +4,8 @@ const showDrafts = import.meta.env.DEV;
 
 export async function getProjects() {
   const all = await getCollection('projects', (p) => showDrafts || !p.data.draft);
-  return all.sort((a, b) => a.data.order - b.data.order);
+  // 최근에 시작한 것부터
+  return all.sort((a, b) => b.data.startedAt.getTime() - a.data.startedAt.getTime());
 }
 
 export async function getLogs() {

@@ -7,7 +7,7 @@ import { url } from '../lib/url';
 
 const projects = await getProjects();
 // 홈에는 최근에 시작한 순서로 4개만 (작업 중·완성 섞어서). 전체는 프로젝트 목록에
-const recent = [...projects].sort((a, b) => b.data.startedAt.getTime() - a.data.startedAt.getTime()).slice(0, 4);
+const recent = projects.slice(0, 4);
 const logs = (await getLogs()).slice(0, 8);
 const projectTitles = Object.fromEntries(projects.map((p) => [p.id, p.data.title]));
 ---
