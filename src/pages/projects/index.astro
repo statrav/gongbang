@@ -20,5 +20,5 @@ const projects = await getProjects();
   .page { padding-top: var(--space-xl); }
   h1 { font-size: var(--text-2xl); }
   .lede { margin: var(--space-xs) 0 var(--space-xl); max-width: 34rem; }
-  .grid { display: grid; gap: var(--space-lg); grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); }
+  .grid { display: grid; gap: var(--space-lg); grid-template-columns: minmax(0, 1fr); }
 </style>
